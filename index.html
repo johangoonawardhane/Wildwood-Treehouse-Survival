@@ -3,606 +3,357 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>WILDWOOD — Ultimate Survival</title>
+<title>WILDWOOD — Treehouse Survival</title>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
 *{box-sizing:border-box}
-body{margin:0;overflow:hidden;background:#101b16;color:white;font-family:Arial,sans-serif}
-canvas{display:block;width:100vw;height:100vh}
-button{border:1px solid #78916e;background:#253c2c;color:white;padding:10px 13px;border-radius:9px;cursor:pointer;font-weight:700}
-button:hover,button.active{background:#b28b48;color:#111}
-button:disabled{opacity:.35;cursor:not-allowed}
-#ui{position:absolute;inset:0;pointer-events:none}
-.panel{background:#14221cE8;border:1px solid #71846b;border-radius:12px;padding:11px;pointer-events:auto;box-shadow:0 5px 20px #0007}
-#top{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;gap:8px;align-items:start}
-#stats{display:flex;gap:14px;flex-wrap:wrap;font-size:13px}
-#left{position:absolute;left:12px;top:105px;width:190px;display:grid;gap:8px}
-#right{position:absolute;right:12px;top:105px;width:205px;display:grid;gap:7px}
-#right button,#left button{width:100%;text-align:left}
-#bottom{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px;flex-wrap:wrap;justify-content:center;width:95%}
-#bottom button{font-size:12px}
-#notice{position:absolute;top:85px;left:50%;transform:translateX(-50%);background:#17251eee;padding:12px 20px;border-radius:10px;display:none;text-align:center;max-width:90%}
-#start{position:absolute;inset:0;background:linear-gradient(#08140bdc,#08140bf0),url('') center/cover;display:flex;align-items:center;justify-content:center;z-index:5;padding:15px}
-#startbox{width:min(650px,100%);max-height:95vh;overflow:auto;background:#18291f;border:1px solid #8b9c79;border-radius:20px;padding:25px;text-align:center}
-h1{font-size:clamp(42px,8vw,75px);letter-spacing:6px;color:#dce9bd;margin:5px}
-h2{color:#c9d7ae}
-.choice{padding:18px;min-width:140px;margin:5px}
-.row{display:flex;justify-content:center;flex-wrap:wrap;gap:8px}
-#treeList{max-height:120px;overflow:auto}
-#leader{position:absolute;bottom:75px;right:12px;font-size:11px}
-#help{position:absolute;bottom:12px;left:12px;font-size:11px}
-#mobile{display:none;position:absolute;bottom:75px;left:12px;gap:6px;pointer-events:auto}
-#mobile button{font-size:20px;padding:13px}
-@media(max-width:750px){
- #left{top:95px;width:115px}
- #right{top:95px;width:135px}
- #left button,#right button{font-size:10px;padding:7px}
- #leader,#help{display:none}
- #stats{font-size:10px;gap:7px}
- #mobile{display:flex}
- #bottom{bottom:5px}
- #bottom button{font-size:10px;padding:7px}
+body{margin:0;overflow:hidden;background:#101a13;color:white;font-family:Inter,Arial,sans-serif}
+canvas{display:block}
+#hud{position:fixed;inset:0;pointer-events:none}
+.panel{background:rgba(13,22,17,.88);border:1px solid rgba(255,255,255,.14);border-radius:12px;backdrop-filter:blur(12px);box-shadow:0 8px 30px #0005}
+#brand{position:absolute;top:18px;left:20px;padding:12px 17px}
+#brand strong{font:800 27px 'Barlow Condensed';letter-spacing:2px}
+#brand small{display:block;color:#a9c69f;font-size:10px;letter-spacing:3px;margin-top:2px}
+#stats{position:absolute;top:18px;right:20px;padding:12px 16px;width:205px}
+.stat{display:flex;justify-content:space-between;font-size:12px;margin:7px 0;color:#dce7d9}
+.bar{height:6px;background:#344438;border-radius:9px;overflow:hidden;margin-top:4px}
+.bar i{display:block;height:100%;width:100%;background:#83c66e;transition:width .2s}
+#clock{font:700 22px 'Barlow Condensed';color:#d9f5c9}
+#hint{position:absolute;top:18px;left:50%;transform:translateX(-50%);padding:10px 16px;font-size:12px;color:#d9e8d4;text-align:center}
+#bottom{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);display:flex;gap:8px;align-items:center}
+.key{padding:10px 13px;font-size:11px;color:#e4eee0}
+.key b{color:#b8e89c}
+#buildPanel{position:absolute;left:20px;bottom:18px;width:275px;padding:14px;pointer-events:auto;max-height:48vh;overflow:auto}
+#buildPanel h3,#setup h2{font:700 21px 'Barlow Condensed';letter-spacing:1px;margin:0 0 10px}
+#buildPanel p{font-size:11px;color:#aabca7;line-height:1.5;margin:5px 0 10px}
+.btn{background:#26382b;color:#edf5e9;border:1px solid #536b50;border-radius:7px;padding:10px 11px;font-weight:700;font-size:11px;cursor:pointer;transition:.15s}
+.btn:hover{background:#405b3d;transform:translateY(-1px)}
+.btn.active{background:#719c56;color:#10200e;border-color:#b8d99a}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.wide{width:100%;margin-top:7px}
+#status{font-size:11px;color:#c9e7b6;min-height:16px;margin:8px 0}
+#templates{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);display:none;gap:8px;padding:10px;pointer-events:auto}
+.template{width:112px;padding:7px;text-align:center;cursor:pointer}
+.template .preview{height:57px;border:1px solid #70836c;border-radius:6px;margin-bottom:6px;background:linear-gradient(145deg,#526b46,#283b2b);display:flex;align-items:center;justify-content:center;font-size:25px}
+.template span{font-size:10px;font-weight:700}
+#setup{position:fixed;inset:0;background:linear-gradient(#101b16d9,#0b130feF),radial-gradient(ellipse at center,#526c45,#101b16);z-index:5;display:flex;align-items:center;justify-content:center;padding:20px}
+#setupBox{width:min(780px,96vw);padding:25px}
+#setup h1{font:800 48px 'Barlow Condensed';letter-spacing:4px;margin:0}
+#setup .sub{color:#b8cbb2;font-size:12px;letter-spacing:3px;margin:0 0 22px}
+.setupRow{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:15px 0}
+.choice{border:2px solid #50654a;border-radius:10px;padding:13px;background:#18271d;cursor:pointer;text-align:center}
+.choice.selected{border-color:#b8e58e;background:#2d442b;box-shadow:0 0 18px #a7d47a55}
+.choice .emoji{font-size:42px}
+.choice strong{display:block;margin-top:7px}
+.choice small{color:#b3c5ad;font-size:10px}
+#start{background:#9cc779;color:#142111;font-size:15px;padding:14px 35px;border:0;border-radius:8px;font-weight:800;cursor:pointer;margin-top:12px}
+#setup .note{font-size:11px;color:#aabca7;line-height:1.5}
+#crosshair{position:fixed;left:50%;top:50%;width:12px;height:12px;transform:translate(-50%,-50%);pointer-events:none;opacity:.8}
+#crosshair:before,#crosshair:after{content:"";position:absolute;background:#fff}
+#crosshair:before{width:12px;height:1px;top:5px}
+#crosshair:after{height:12px;width:1px;left:5px}
+#message{position:absolute;top:75px;left:50%;transform:translateX(-50%);padding:10px 16px;font-size:12px;opacity:0;transition:opacity .2s}
+#message.show{opacity:1}
+#mobile{display:none}
+@media(max-width:800px){
+#stats{top:12px;right:12px;width:160px}#brand{top:12px;left:12px}
+#buildPanel{left:10px;bottom:10px;width:220px}
+#hint{top:90px}#bottom{display:none}
+#templates{bottom:10px;left:auto;right:10px;transform:none;flex-direction:column}
+.template{width:95px}
 }
 </style>
 </head>
 <body>
-<canvas id="world"></canvas>
-<div id="ui">
- <div id="top">
-  <div class="panel">
-   <strong>🌲 WILDWOOD</strong>
-   <div id="stats">🪵 30 planks | 🪓 Axe | ❤️ 100</div>
+<div id="setup">
+ <div id="setupBox" class="panel">
+  <h1>WILDWOOD</h1><div class="sub">TREEHOUSE SURVIVAL · WILDERNESS EDITION</div>
+  <h2>Choose your character</h2>
+  <div class="setupRow">
+   <div class="choice selected" data-choice="boy"><div class="emoji">🧑🏻</div><strong>BOY</strong><small>Explorer outfit</small></div>
+   <div class="choice" data-choice="girl"><div class="emoji">🧑🏽</div><strong>GIRL</strong><small>Explorer outfit</small></div>
   </div>
-  <div class="panel" id="clock">PREPARATION: 20:00</div>
- </div>
-
- <div id="notice"></div>
-
- <div class="panel" id="left">
-  <strong>🎒 INVENTORY</strong>
-  <div id="inventory">Planks: 30<br>Wood: 0</div>
-  <hr>
-  <strong>🌳 TREES</strong>
-  <div id="treeList">No tree selected</div>
-  <button onclick="selectNearest()">🎯 Select nearest tree</button>
-  <button onclick="chop()">🪓 Chop selected tree</button>
-  <button onclick="gather()">🪵 Gather wood</button>
- </div>
-
- <div class="panel" id="right">
-  <strong>🏗️ CONSTRUCTION</strong>
-  <button onclick="chooseBuild('floor')">▰ Flat floor (2)</button>
-  <button onclick="chooseBuild('ramp')">／ Ramp (2)</button>
-  <button onclick="chooseBuild('wall')">▥ Wall (2)</button>
-  <button onclick="chooseBuild('roof')">⌂ Roof (2)</button>
-  <button onclick="chooseBuild('ladder')">🪜 Ladder (3)</button>
-  <button onclick="chooseBuild('window')">▣ Window (2)</button>
-  <button onclick="chooseBuild('door')">🚪 Door (2)</button>
-  <button onclick="chooseBuild('erase')">✖ Remove structure</button>
-  <hr>
-  <strong>🏡 STARTER TEMPLATES</strong>
-  <button onclick="template('small')">Small shelter</button>
-  <button onclick="template('cabin')">Forest cabin</button>
-  <button onclick="template('tower')">Lookout tower</button>
- </div>
-
- <div class="panel" id="bottom">
-  <button onclick="buildFire()">🔥 Campfire</button>
-  <button onclick="buildPit()">🪨 Fire pit</button>
-  <button onclick="toggleVehicle()">🚙 Getaway vehicle</button>
-  <button onclick="switchWeapon()">🛡️ Switch defence</button>
-  <button onclick="useWeapon()">✨ Use defence</button>
-  <button onclick="changeWeather()">🌦 Weather</button>
-  <button onclick="changeWorld()">🌍 Change biome</button>
-  <button onclick="toggleMap()">🗺 Map</button>
-  <button onclick="saveGame()">💾 Save</button>
- </div>
-
- <div class="panel" id="leader">
-  <strong>🏆 PERSONAL RECORDS</strong>
-  <div id="records">No records yet</div>
- </div>
- <div id="help" class="panel">WASD move · SPACE jump · Click to build · E interact · Mouse wheel zoom</div>
- <div id="mobile">
-  <button onclick="movePlayer(-1)">◀</button>
-  <button onclick="jump()">▲</button>
-  <button onclick="movePlayer(1)">▶</button>
+  <h2>Choose your wilderness</h2>
+  <div class="setupRow">
+   <div class="choice selected" data-world="forest"><div class="emoji">🌲</div><strong>DEEP FOREST</strong><small>Dense woodland and tall trees</small></div>
+   <div class="choice" data-world="mountain"><div class="emoji">🏔️</div><strong>FROZEN MOUNTAINS</strong><small>Snowy slopes and icy weather</small></div>
+  </div>
+  <div class="setupRow">
+   <div class="choice" data-world="windy"><div class="emoji">🌬️</div><strong>WINDY HIGHLANDS</strong><small>Open ground and strong winds</small></div>
+   <div class="choice" data-world="forest"><div class="emoji">🌳</div><strong>WOODLAND</strong><small>Survive among ancient trees</small></div>
+  </div>
+  <p class="note">You have 20 minutes to prepare before predators begin roaming. Find a tree, build a shelter and stay safe. This is a browser game; progress is saved locally on this device.</p>
+  <button id="start">ENTER THE WILDERNESS</button>
  </div>
 </div>
-
-<div id="start">
- <div id="startbox">
-  <h1>WILDWOOD</h1>
-  <h2>THE ULTIMATE TREEHOUSE SURVIVAL</h2>
-  <p>Build above the wilderness. Survive below it.</p>
-  <h3>Choose your survivor</h3>
-  <div class="row">
-   <button class="choice" onclick="pickCharacter('boy')">🧑‍🌾<br>BOY</button>
-   <button class="choice" onclick="pickCharacter('girl')">👩‍🌾<br>GIRL</button>
+<div id="hud">
+ <div id="brand" class="panel"><strong>WILDWOOD</strong><small>TREEHOUSE SURVIVAL</small></div>
+ <div id="hint" class="panel">WASD move · SHIFT run · RIGHT MOUSE look around · E interact</div>
+ <div id="stats" class="panel">
+  <div id="clock">PREPARATION 20:00</div>
+  <div class="stat"><span>HEALTH</span><b id="healthText">100%</b></div><div class="bar"><i id="healthBar"></i></div>
+  <div class="stat"><span>WOOD</span><b id="wood">0 planks</b></div>
+  <div class="stat"><span>SURVIVAL</span><b id="survival">00:00</b></div>
+  <div class="stat"><span>WEATHER</span><b id="weather">CLEAR</b></div>
+ </div>
+ <div id="message" class="panel"></div>
+ <div id="buildPanel" class="panel">
+  <h3>YOUR SURVIVAL TOOLKIT</h3>
+  <p>Choose a tree to claim a building site. Select a template below to start your treehouse.</p>
+  <div id="status">No tree selected. Walk up to a tree and press E.</div>
+  <div class="grid">
+   <button class="btn" id="selectTree">SELECT TREE</button>
+   <button class="btn" id="chop">CHOP TREE</button>
+   <button class="btn" id="floor">FLOOR</button>
+   <button class="btn" id="wall">WALL</button>
+   <button class="btn" id="ramp">RAMP</button>
+   <button class="btn" id="ladder">LADDER</button>
   </div>
-  <h3>Choose your wilderness</h3>
-  <div class="row">
-   <button class="choice" onclick="pickBiome('forest')">🌲<br>DEEP FOREST</button>
-   <button class="choice" onclick="pickBiome('snow')">❄️<br>FROZEN MOUNTAIN</button>
-   <button class="choice" onclick="pickBiome('wind')">🌬️<br>WINDY HIGHLANDS</button>
-  </div>
-  <h3>Choose a difficulty</h3>
-  <div class="row">
-   <button class="choice" onclick="difficulty='easy';notify('Easy difficulty selected')">EXPLORER</button>
-   <button class="choice" onclick="difficulty='normal';notify('Normal difficulty selected')">SURVIVOR</button>
-   <button class="choice" onclick="difficulty='hard';notify('Hard difficulty selected')">WILDERNESS</button>
-  </div>
-  <p style="color:#b7c8ad;line-height:1.7;font-size:13px">
-   You have 20 minutes to prepare. Choose a tree, construct your shelter and collect supplies. Predators begin roaming afterwards. Every hour of survival, you must leave your shelter and gather more supplies.
-  </p>
-  <button style="font-size:19px;padding:16px 40px" onclick="start()">ENTER WILDERNESS →</button>
+  <button class="btn wide" id="fire">🔥 BUILD CAMPFIRE (5 WOOD)</button>
+  <button class="btn wide" id="car">🚙 GETAWAY VEHICLE</button>
+  <button class="btn wide" id="weatherBtn">🌧️ CHANGE WEATHER</button>
+  <button class="btn wide" id="leave">RETURN TO MENU</button>
+ </div>
+ <div id="templates" class="panel">
+  <div class="template" data-template="starter"><div class="preview">🛖</div><span>STARTER PLATFORM</span></div>
+  <div class="template" data-template="cabin"><div class="preview">🏡</div><span>WOODLAND CABIN</span></div>
+  <div class="template" data-template="lookout"><div class="preview">🛖</div><span>LOOKOUT TOWER</span></div>
+ </div>
+ <div id="bottom">
+  <div class="key panel"><b>W A S D</b> Move</div>
+  <div class="key panel"><b>SHIFT</b> Run</div>
+  <div class="key panel"><b>SPACE</b> Jump</div>
+  <div class="key panel"><b>RIGHT MOUSE</b> Look 360°</div>
+  <div class="key panel"><b>E</b> Interact</div>
  </div>
 </div>
+<div id="crosshair"></div>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script>
-'use strict';
+const scene=new THREE.Scene();
+let biome='forest',character='boy',selectedTree=null,wood=0,health=100,elapsed=0,prep=1200,started=false,weatherMode=0;
+scene.background=new THREE.Color(0x9bb4bd);
+scene.fog=new THREE.FogExp2(0x9bb4bd,.008);
+const camera=new THREE.PerspectiveCamera(70,innerWidth/innerHeight,.1,700);
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;
+document.body.appendChild(renderer.domElement);
 
-// WILDWOOD 3D SURVIVAL
-let scene,camera,renderer,clock3;
-let player,playerGroup,trees=[],structures=[],animals=[],leaves=[],rain=[],fires=[];
-let character='boy',biome='forest',difficulty='normal';
-let planks=30,wood=0,health=100,selected=null;
-let buildMode=null,elapsed=0,prepTime=1200;
-let running=false,ended=false,vehicle=null,driving=false;
-let weapon=0,weaponNames=['Signal flare','Noise beacon','Decoy'];
-let lastAttack=0,lastGather=0,lastHour=0;
-let dayWeather='clear',rainEnabled=false,showMap=false;
-let velocity=new THREE.Vector3();
-let keys={},groundY=0,zoom=1;
-let records=[];
-try{records=JSON.parse(localStorage.getItem('wildwood3records')||'[]')}catch(e){}
+scene.add(new THREE.HemisphereLight(0xc8e3ff,0x43513a,1.5));
+const sun=new THREE.DirectionalLight(0xffe8c7,2.1);sun.position.set(-45,80,35);sun.castShadow=true;
+sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-90;sun.shadow.camera.right=90;sun.shadow.camera.top=90;sun.shadow.camera.bottom=-90;scene.add(sun);
 
-const $=id=>document.getElementById(id);
-const rand=(a,b)=>a+Math.random()*(b-a);
-const mats={};
+const mat=(color,roughness=.9)=>new THREE.MeshStandardMaterial({color,roughness});
+const groundMat=mat(0x405a35),trunkMat=mat(0x59402c),barkMat=mat(0x493522),leafMats=[mat(0x244b2d),mat(0x315b35),mat(0x3c6538),mat(0x1c4028)];
+const snowMat=mat(0xdce8ec),woodMat=mat(0x91613a),darkWood=mat(0x593a25),leafSnow=mat(0xe4edf0);
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(500,500),groundMat);ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
+const treeObjects=[],colliders=[],buildings=[],particles=[];
+function random(a,b){return a+Math.random()*(b-a)}
+function addTree(x,z,scale=1){
+ const g=new THREE.Group();g.position.set(x,0,z);g.scale.setScalar(scale);
+ const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.32,.58,8,9),trunkMat);trunk.position.y=4;trunk.castShadow=true;trunk.receiveShadow=true;g.add(trunk);
+ for(let i=0;i<7;i++){
+  const h=4.4+i*.68,rad=3.5-i*.38;
+  const foliage=new THREE.Mesh(new THREE.ConeGeometry(rad,4.2,8),biome==='mountain'?leafSnow:leafMats[i%leafMats.length]);
+  foliage.position.set(random(-.15,.15),h,random(-.15,.15));foliage.rotation.y=random(0,6.28);foliage.castShadow=true;foliage.receiveShadow=true;g.add(foliage);
+ }
+ // Bark ridges and branch-like details
+ for(let i=0;i<8;i++){
+  const b=new THREE.Mesh(new THREE.CylinderGeometry(.035,.07,random(2,4),5),barkMat);
+  b.position.set(random(-.25,.25),random(2,6),random(-.25,.25));b.rotation.z=random(-.25,.25);g.add(b);
+ }
+ scene.add(g);g.userData={tree:true,cut:false,scale};treeObjects.push(g);colliders.push({x,z,r:1.05*scale,obj:g});return g;
+}
+function makeForest(){
+ for(let i=0;i<230;i++){
+  let x=random(-105,105),z=random(-105,105);
+  if(Math.hypot(x,z)<9)continue;
+  addTree(x,z,random(.75,1.35));
+ }
+ for(let i=0;i<70;i++){
+  const rock=new THREE.Mesh(new THREE.DodecahedronGeometry(random(.3,1.2),1),mat(biome==='mountain'?0x89979b:0x62695b));
+  rock.position.set(random(-95,95),.25,random(-95,95));rock.scale.y=random(.4,1);rock.castShadow=true;scene.add(rock);
+ }
+ // distant hills
+ for(let i=0;i<18;i++){
+  const hill=new THREE.Mesh(new THREE.ConeGeometry(random(12,24),random(20,38),7),mat(biome==='mountain'?0xaabac0:0x344b34));
+  hill.position.set(random(-150,150),random(8,15),random(-150,150));scene.add(hill);
+ }
+}
+makeForest();
 
-function mat(color,roughness=1){
- return new THREE.MeshStandardMaterial({color,roughness});
+function makePerson(isGirl){
+ const group=new THREE.Group();
+ const skin=mat(isGirl?0xb97955:0xc58d69),shirt=mat(isGirl?0x9b4b37:0x315d86),trousers=mat(0x303d39),boots=mat(0x34291e),hair=mat(isGirl?0x302018:0x3b2a20);
+ const sphere=(parent,m,x,y,z,sx,sy,sz)=>{const o=new THREE.Mesh(new THREE.SphereGeometry(1,16,12),m);o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.castShadow=true;parent.add(o);return o};
+ const torso=sphere(group,shirt,0,1.35,0,.38,.55,.22);
+ sphere(group,skin,0,2.08,0,.25,.3,.24);
+ sphere(group,hair,0,2.28,-.045,.27,.17,.25);
+ // face details
+ sphere(group,mat(0x28211c),-.09,2.11,.21,.025,.025,.02);sphere(group,mat(0x28211c),.09,2.11,.21,.025,.025,.02);
+ const limbs=[];
+ for(const side of [-1,1]){
+  const arm=new THREE.Group();arm.position.set(side*.43,1.68,0);group.add(arm);
+  const upper=sphere(arm,shirt,0,-.23,0,.14,.3,.14);
+  sphere(arm,skin,0,-.52,.015,.12,.15,.12);limbs.push(arm);
+  const leg=new THREE.Group();leg.position.set(side*.18,.9,0);group.add(leg);
+  sphere(leg,trousers,0,-.28,0,.17,.34,.17);
+  sphere(leg,boots,0,-.58,.08,.17,.11,.27);limbs.push(leg);
+ }
+ group.userData={limbs};group.position.set(0,0,0);scene.add(group);return group;
 }
-function makeMaterial(name,color,roughness=1){
- mats[name]=mat(color,roughness);
-}
-function cube(x,y,z,sx,sy,sz,material,parent=scene){
- let m=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),material);
- m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;
-}
-function sphere(x,y,z,r,material,parent=scene){
- let m=new THREE.Mesh(new THREE.SphereGeometry(r,12,10),material);
- m.position.set(x,y,z);m.castShadow=true;parent.add(m);return m;
-}
-function notify(text){
- let n=$('notice');n.innerText=text;n.style.display='block';
- clearTimeout(notify.timer);notify.timer=setTimeout(()=>n.style.display='none',3000);
-}
-function pickCharacter(c){character=c}
-function pickBiome(b){biome=b}
+const player=makePerson(false);player.position.set(0,0,0);
+const vehicle=new THREE.Group();scene.add(vehicle);
+const carBody=new THREE.Mesh(new THREE.BoxGeometry(2.3,.75,4),mat(0x9b342b));carBody.position.y=.8;carBody.castShadow=true;vehicle.add(carBody);
+const roof=new THREE.Mesh(new THREE.BoxGeometry(1.8,.7,2),mat(0x34434a));roof.position.set(0,1.48,-.15);vehicle.add(roof);
+for(const x of [-1,1])for(const z of [-1.35,1.35]){
+ const w=new THREE.Mesh(new THREE.CylinderGeometry(.4,.4,.22,16),mat(0x171a1a));w.rotation.z=Math.PI/2;w.position.set(x,.4,z);vehicle.add(w);
+}vehicle.position.set(6,0,4);vehicle.visible=true;
 
-function setup3D(){
- scene=new THREE.Scene();
- scene.fog=new THREE.Fog(biome==='snow'?0xc7d9df:0x8da78b,35,190);
- scene.background=new THREE.Color(biome==='snow'?0xaac7d4:0x8caa90);
- camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,700);
- renderer=new THREE.WebGLRenderer({antialias:true});
- renderer.setSize(innerWidth,innerHeight);
- renderer.setPixelRatio(Math.min(devicePixelRatio,2));
- renderer.shadowMap.enabled=true;
- renderer.shadowMap.type=THREE.PCFSoftShadowMap;
- renderer.outputEncoding=THREE.sRGBEncoding;
- renderer.toneMapping=THREE.ACESFilmicToneMapping;
- renderer.toneMappingExposure=1.1;
- document.body.insertBefore(renderer.domElement,document.body.firstChild);
- renderer.domElement.style.position='absolute';
- renderer.domElement.style.inset='0';
- renderer.domElement.style.zIndex='0';
- $('ui').style.zIndex='2';
+let yaw=0,pitch=-.22,cameraDistance=7,keys={},velocityY=0,onGround=true;
+const raycaster=new THREE.Raycaster(),mouse=new THREE.Vector2(0,0);
+let rightDragging=false,lastX=0,lastY=0;
+renderer.domElement.addEventListener('contextmenu',e=>e.preventDefault());
+renderer.domElement.addEventListener('mousedown',e=>{if(e.button===2){rightDragging=true;lastX=e.clientX;lastY=e.clientY}});
+addEventListener('mouseup',e=>{if(e.button===2)rightDragging=false});
+addEventListener('mousemove',e=>{if(rightDragging){yaw-=(e.clientX-lastX)*.005;pitch=Math.max(-1.1,Math.min(.3,pitch-(e.clientY-lastY)*.004));lastX=e.clientX;lastY=e.clientY}});
+addEventListener('wheel',e=>{cameraDistance=Math.max(3,Math.min(13,cameraDistance+e.deltaY*.008))},{passive:true});
+addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='Space'&&onGround){velocityY=7;onGround=false}if(e.code==='KeyE')interact()});
+addEventListener('keyup',e=>keys[e.code]=false);
 
- const hemi=new THREE.HemisphereLight(0xd9edff,0x34442a,1.6);
- scene.add(hemi);
- const sun=new THREE.DirectionalLight(0xfff0d5,2.4);
- sun.position.set(-45,80,30);
- sun.castShadow=true;
- sun.shadow.mapSize.set(2048,2048);
- sun.shadow.camera.left=-100;sun.shadow.camera.right=100;
- sun.shadow.camera.top=100;sun.shadow.camera.bottom=-100;
- scene.add(sun);
-
- makeMaterial('bark',0x59402c);
- makeMaterial('leaves',biome==='snow'?0x315c55:0x244d30);
- makeMaterial('leaf2',0x416e3b);
- makeMaterial('wood',0x9b7045);
- makeMaterial('wood2',0x765033);
- makeMaterial('grass',biome==='snow'?0xe0edf0:0x435c32);
- makeMaterial('rock',0x74786e);
- makeMaterial('white',0xf1f0e9);
- makeMaterial('dark',0x252a28);
- makeMaterial('skin',0xb98660);
- makeMaterial('clothes',character==='boy'?0x455e6a:0x80536a);
- makeMaterial('metal',0x424b4b,.4);
- makeMaterial('fire',0xff8b21);
-
- createGround();
- createForest();
- createMountains();
- createPlayer();
- createVehicle();
-}
-
-function createGround(){
- let geo=new THREE.PlaneGeometry(600,600,80,80);
- geo.rotateX(-Math.PI/2);
- let pos=geo.attributes.position;
- for(let i=0;i<pos.count;i++){
-  let x=pos.getX(i),z=pos.getZ(i);
-  let y=Math.sin(x*.04)*.45+Math.cos(z*.06)*.35;
-  if(biome==='snow')y+=Math.sin(x*.01)*1.5;
-  pos.setY(i,y);
- }
- geo.computeVertexNormals();
- let ground=new THREE.Mesh(geo,mats.grass);
- ground.receiveShadow=true;scene.add(ground);
- ground.userData.ground=true;
-}
-function createTree(x,z){
- let group=new THREE.Group();group.position.set(x,0,z);scene.add(group);
- let h=rand(12,20),radius=rand(.45,.8);
- let trunk=new THREE.Mesh(new THREE.CylinderGeometry(radius*.7,radius,h,9),mats.bark);
- trunk.position.y=h/2;trunk.castShadow=true;group.add(trunk);
- for(let i=0;i<5;i++){
-  let r=rand(3,5),y=h*.52+i*h*.105;
-  let cone=new THREE.Mesh(new THREE.ConeGeometry(r,rand(4,7),9),mats[i%2?'leaf2':'leaves']);
-  cone.position.set(rand(-.3,.3),y,rand(-.3,.3));cone.castShadow=true;group.add(cone);
- }
- let t={group,x,z,h,radius,cut:false,planks:Math.floor(rand(8,14))};
- group.userData.tree=t;
- trees.push(t);
-}
-function createForest(){
- for(let i=0;i<180;i++){
-  let x=rand(-180,180),z=rand(-180,180);
-  if(Math.hypot(x,z)<12)continue;
-  createTree(x,z);
- }
- // rocks and ferns
- for(let i=0;i<150;i++){
-  let x=rand(-180,180),z=rand(-180,180);
-  let rock=sphere(x,rand(.2,.6),z,rand(.3,1.2),mats.rock);
-  rock.scale.y=.5;
- }
-}
-function createMountains(){
- for(let i=0;i<14;i++){
-  let m=new THREE.Mesh(new THREE.ConeGeometry(rand(12,25),rand(25,50),7),
-   mat(biome==='snow'?0xd5e2e7:0x52664b));
-  m.position.set(rand(-190,190),12,rand(-190,190));
-  scene.add(m);
- }
-}
-function createPlayer(){
- playerGroup=new THREE.Group();scene.add(playerGroup);
- // boots
- cube(-.22,.3,0,.3,.55,.42,mats.dark,playerGroup);
- cube(.22,.3,0,.3,.55,.42,mats.dark,playerGroup);
- // legs
- cube(-.2,.85,0,.3,.65,.3,mats.dark,playerGroup);
- cube(.2,.85,0,.3,.65,.3,mats.dark,playerGroup);
- // torso
- cube(0,1.55,0,.85,.9,.45,mats.clothes,playerGroup);
- // arms
- cube(-.56,1.55,0,.23,.8,.24,mats.clothes,playerGroup);
- cube(.56,1.55,0,.23,.8,.24,mats.clothes,playerGroup);
- // backpack
- cube(0,1.55,-.31,.58,.7,.25,mats.wood2,playerGroup);
- // head
- sphere(0,2.25,0,.32,mats.skin,playerGroup);
- // hair / cap
- sphere(0,2.47,0,.34,mats.dark,playerGroup);
- // survival hat
- let hat=cube(0,2.55,0,.7,.08,.6,mats.wood2,playerGroup);
- playerGroup.position.set(0,0,0);
- player={x:0,z:0,y:0};
-}
-function createVehicle(){
- vehicle=new THREE.Group();scene.add(vehicle);
- cube(0,.85,0,3.5,1.2,5,mats.clothes,vehicle);
- cube(0,1.65,-.2,2.8,.85,2.7,mats.white,vehicle);
- for(let x of [-1.7,1.7])for(let z of [-1.6,1.6]){
-  let w=new THREE.Mesh(new THREE.CylinderGeometry(.48,.48,.3,16),mats.dark);
-  w.rotation.z=Math.PI/2;w.position.set(x,.5,z);vehicle.add(w);
- }
- vehicle.visible=false;
-}
-
-function makeStructure(x,y,z,type){
- let group=new THREE.Group();group.position.set(x,y,z);scene.add(group);
- let woodmat=mats.wood;
- if(type==='floor'){
-  cube(0,0,0,4,.3,4,woodmat,group);
-  for(let i=-1;i<=1;i++)cube(i*1.2,-.2,0,.12,.25,4,mats.wood2,group);
- }
- if(type==='wall'||type==='door'||type==='window'){
-  cube(0,1.5,0,4,3,.25,woodmat,group);
-  for(let i=-1;i<=1;i++)cube(i*1.3,1.5,.17,.1,3,.1,mats.wood2,group);
-  if(type==='door')cube(0,1.2,.2,1.2,2.4,.12,mats.wood2,group);
-  if(type==='window'){
-   cube(0,1.8,.2,1.5,1,.1,mat(0x8cc3c7,.3),group);
-  }
- }
- if(type==='roof'){
-  let roof=cube(0,0,0,4.5,.3,4.5,mats.wood2,group);
-  roof.rotation.z=-.25;
- }
- if(type==='ramp'){
-  let ramp=cube(0,0,0,4,.3,5,woodmat,group);
-  ramp.rotation.x=-.35;
- }
- if(type==='ladder'){
-  cube(-1,1.5,0,.18,3,.18,mats.wood2,group);
-  cube(1,1.5,0,.18,3,.18,mats.wood2,group);
-  for(let i=0;i<7;i++)cube(0,i*.42,0,2,.13,.18,woodmat,group);
- }
- group.userData={type};
- structures.push(group);
- return group;
-}
-function chooseBuild(type){
- buildMode=type;
- document.querySelectorAll('#right button').forEach(b=>b.classList.remove('active'));
- notify('Selected '+type+'. Click a location in the world to build.');
-}
 function nearestTree(){
- return trees.filter(t=>!t.cut).sort((a,b)=>distance(a)-distance(b))[0];
+ let best=null,dist=8;
+ for(const t of treeObjects){if(t.userData.cut)continue;const d=player.position.distanceTo(t.position);if(d<dist){best=t;dist=d}}
+ return best;
 }
-function distance(t){return Math.hypot(t.x-player.x,t.z-player.z)}
-function selectNearest(){
- let t=nearestTree();
- if(!t||distance(t)>35){notify('No tree nearby. Explore the forest!');return}
- selected=t;
- $('treeList').innerText='Selected tree · '+t.planks+' wood available';
- notify('Tree selected! Choose a starter design.');
+function showMessage(s){const el=document.getElementById('message');el.textContent=s;el.classList.add('show');clearTimeout(showMessage.t);showMessage.t=setTimeout(()=>el.classList.remove('show'),2200)}
+function setStatus(s){document.getElementById('status').textContent=s}
+function selectTree(){
+ const t=nearestTree();if(!t){showMessage('Move closer to a tree first');return}
+ if(selectedTree)selectedTree.traverse(o=>{if(o.isMesh)o.material=o.userData.original||o.material});
+ selectedTree=t;t.traverse(o=>{if(o.isMesh){o.userData.original=o.material;o.material=o.material.clone();o.material.emissive=new THREE.Color(0x527c2e);o.material.emissiveIntensity=.55}});
+ setStatus('TREE SELECTED — choose a template below');document.getElementById('templates').style.display='flex';showMessage('Tree selected! Choose your treehouse design.');
 }
+function interact(){const t=nearestTree();if(t){selectTree();return}showMessage('Walk closer to a tree or building to interact.')}
 function chop(){
- if(!selected||selected.cut){notify('Select an uncut tree first.');return}
- if(distance(selected)>35){notify('Move closer to the selected tree.');return}
- selected.cut=true;
- scene.remove(selected.group);
- wood+=selected.planks;
- planks+=selected.planks*2;
- notify('Tree harvested! '+selected.planks+' logs converted into planks.');
- updateHUD();
+ if(!selectedTree){showMessage('Select a tree first');return}
+ if(selectedTree.userData.cut){showMessage('This tree has already been chopped');return}
+ selectedTree.userData.cut=true;scene.remove(selectedTree);wood+=8;document.getElementById('wood').textContent=wood+' planks';setStatus('Tree chopped! +8 planks. Select another tree to build.');selectedTree=null;showMessage('Tree chopped — 8 planks collected!');
 }
-function gather(){
- if(!selected||distance(selected)>35){notify('Select a nearby tree first.');return}
- if(selected.cut){wood+=2;planks+=4;notify('Gathered 2 spare logs.')}
- else notify('Chop the selected tree first.');
- updateHUD();
+function box(parent,w,h,d,x,y,z,material){
+ const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o;
 }
-function template(type){
- if(!selected){notify('Select a tree before using a template.');return}
- let layouts={
-  small:[[-2,5,'floor'],[2,5,'floor'],[-2,5,'wall'],[2,5,'wall']],
-  cabin:[[-4,5,'floor'],[0,5,'floor'],[4,5,'floor'],[-4,5,'wall'],[0,5,'wall'],[4,5,'wall'],[0,8,'roof']],
-  tower:[[-2,5,'floor'],[2,5,'floor'],[-2,9,'floor'],[2,9,'floor'],[0,5,'ladder'],[0,9,'wall']]
- };
- let arr=layouts[type];
- if(planks<arr.length*2){notify('Not enough planks. Chop more trees.');return}
- arr.forEach(([x,y,t])=>makeStructure(selected.x+x,selected.h+y,selected.z,t));
- planks-=arr.length*2;updateHUD();notify('Template built! Continue expanding it.');
+function buildPiece(type,x,y,z){
+ const g=new THREE.Group();g.position.set(x,y,z);scene.add(g);
+ if(type==='floor'){box(g,5,.28,5,0,0,0,woodMat);for(let i=-2;i<=2;i++)box(g,.08,.3,5,i,0,0,darkWood)}
+ if(type==='wall'){box(g,5,2.5,.22,0,1.25,0,woodMat);for(let i=-2;i<=2;i++)box(g,.12,2.5,.3,i,1.25,0,darkWood)}
+ if(type==='ramp'){const r=box(g,3,.2,5,0,1.1,0,woodMat);r.rotation.x=-.35;for(let i=-1;i<=1;i++)box(g,.12,.2,5,i,1.1,0,darkWood)}
+ if(type==='ladder'){for(let x of [-.55,.55]){const side=box(g,.16,5,.16,x,2.5,0,darkWood);side.rotation.z=0}for(let y=.3;y<5;y+=.55)box(g,1.3,.12,.18,0,y,0,woodMat)}
+ if(type==='fire'){const flame=new THREE.Mesh(new THREE.ConeGeometry(.35,1.2,7),new THREE.MeshBasicMaterial({color:0xff8b23}));flame.position.y=.8;g.add(flame);const light=new THREE.PointLight(0xff8a31,2,12);light.position.y=1;g.add(light);for(let i=0;i<5;i++){const log=box(g,1.5,.18,.2,0,.12,0,darkWood);log.rotation.y=i*Math.PI/5}}
+ buildings.push(g);return g;
 }
-function buildAt(point){
- if(!buildMode){notify('Choose a construction piece first.');return}
- if(!selected){notify('Select a tree first.');return}
- if(planks<2){notify('You need more planks.');return}
- if(buildMode==='erase'){
-  let nearest=structures.map(s=>({s,d:s.position.distanceTo(point)})).sort((a,b)=>a.d-b.d)[0];
-  if(nearest&&nearest.d<5){scene.remove(nearest.s);structures=structures.filter(s=>s!==nearest.s);planks+=2;updateHUD();notify('Structure removed.');}
-  return;
+function placeTemplate(name){
+ if(!selectedTree){showMessage('Select a tree first');return}
+ const p=selectedTree.position.clone();const baseY=7.5;
+ const cost=name==='starter'?8:name==='cabin'?18:14;
+ if(wood<cost){showMessage('Not enough planks. Chop more trees!');return}
+ wood-=cost;document.getElementById('wood').textContent=wood+' planks';
+ buildPiece('floor',p.x,baseY,p.z);
+ buildPiece('ladder',p.x-3,2.5,p.z);
+ if(name==='cabin'){
+  for(const a of [[0,1.3,-2.4],[0,1.3,2.4],[-2.4,1.3,0],[2.4,1.3,0]]){const w=box(scene,4.8,2.5,.2,p.x+a[0],baseY+a[1],p.z+a[2],woodMat);if(Math.abs(a[0])>0)w.rotation.y=Math.PI/2}
+  box(scene,5,.2,5,p.x,baseY+2.6,p.z,darkWood);
+ }else if(name==='lookout'){
+  for(const a of [[-2,-2],[-2,2],[2,-2],[2,2]])box(scene,.25,7.5,.25,p.x+a[0],3.75,p.z+a[1],darkWood);
  }
- let cost=buildMode==='ladder'?3:2;
- if(planks<cost){notify('Not enough planks.');return}
- makeStructure(point.x,Math.max(point.y,selected.h+2),point.z,buildMode);
- planks-=cost;updateHUD();
+ selectedTree.traverse(o=>{if(o.isMesh&&o.userData.original)o.material=o.userData.original});
+ selectedTree=null;document.getElementById('templates').style.display='none';setStatus('TEMPLATE BUILT — ladder included. Keep building!');showMessage('Your treehouse template is ready!');
 }
-function buildFire(){
- if(planks<3){notify('You need 3 planks.');return}
- let g=new THREE.Group();g.position.set(player.x,0,player.z+3);scene.add(g);
- for(let i=0;i<3;i++){
-  let log=cube(0,.2,0,1.8,.2,.25,mats.wood2,g);log.rotation.y=i*Math.PI/3;
- }
- let flame=new THREE.Mesh(new THREE.ConeGeometry(.45,1.4,8),mats.fire);
- flame.position.y=.9;g.add(flame);
- fires.push(g);planks-=3;updateHUD();notify('Campfire built!');
+function place(type){
+ if(type!=='ladder'&&!selectedTree){showMessage('Select a tree first');return}
+ const cost=type==='ladder'?3:2;if(wood<cost){showMessage('Not enough planks! Chop trees first.');return}
+ wood-=cost;document.getElementById('wood').textContent=wood+' planks';
+ let p=selectedTree?selectedTree.position.clone():player.position.clone();buildPiece(type,p.x+(type==='ladder'?2:0),type==='ladder'?0:7.5,p.z);showMessage(type.toUpperCase()+' built!');
 }
-function buildPit(){
- if(planks<4){notify('You need 4 planks.');return}
- let g=new THREE.Group();g.position.set(player.x,0,player.z+3);scene.add(g);
- for(let i=0;i<9;i++){
-  let a=i*Math.PI*2/9;
-  sphere(Math.cos(a)*1.2,.25,Math.sin(a)*1.2,.35,mats.rock,g);
- }
- fires.push(g);planks-=4;updateHUD();notify('Fire pit built!');
-}
-function toggleVehicle(){
- driving=!driving;vehicle.visible=driving;
- vehicle.position.set(player.x,0,player.z-5);
- notify(driving?'Vehicle ready. Use WASD to drive.':'Vehicle parked.');
-}
-function switchWeapon(){weapon=(weapon+1)%weaponNames.length;notify('Selected: '+weaponNames[weapon])}
-function useWeapon(){
- if(elapsed<prepTime){notify('Defence gadgets are available when predators arrive.');return}
- if(Date.now()-lastAttack<8000){notify('Your gadget is recharging.');return}
- lastAttack=Date.now();
- animals.forEach(a=>{a.userData.scared=10});
- notify(weaponNames[weapon]+' activated! Nearby predators are distracted.');
-}
-function changeWeather(){
- rainEnabled=!rainEnabled;
- if(rainEnabled)createRain();else rain.forEach(r=>scene.remove(r));
- if(!rainEnabled)rain=[];
- notify(rainEnabled?'Rain started.':'Weather cleared.');
-}
-function createRain(){
- for(let i=0;i<250;i++){
-  let m=new THREE.Mesh(new THREE.BoxGeometry(.025,.7,.025),mat(0xb4d5e4,.3));
-  m.position.set(player.x+rand(-50,50),rand(5,45),player.z+rand(-50,50));
-  scene.add(m);rain.push(m);
- }
-}
-function changeWorld(){
- notify('Restart to choose a different wilderness.');
-}
-function toggleMap(){showMap=!showMap;notify(showMap?'Explore the surrounding forest.':'Map closed.')}
-function saveGame(){
- try{
-  localStorage.setItem('wildwoodSave',JSON.stringify({planks,wood,health,elapsed,player,biome,character}));
-  notify('Game saved on this device.');
- }catch(e){notify('Could not save game.')}
-}
-function updateHUD(){
- $('stats').innerText='🪵 '+planks+' planks | 🪓 Axe | ❤️ '+Math.round(health);
- $('inventory').innerHTML='Planks: '+planks+'<br>Wood: '+wood+'<br>Health: '+Math.round(health)+'%';
- $('treeList').innerText=selected?(selected.cut?'Tree harvested': 'Tree selected · '+selected.planks+' logs'):'No tree selected';
- $('clock').innerText=elapsed<prepTime?'PREPARATION: '+format(prepTime-elapsed):'SURVIVAL: '+format(elapsed-prepTime);
- $('records').innerHTML=records.slice(0,5).map((r,i)=>(i+1)+'. '+r.name+' — '+format(r.time)).join('<br>')||'No records yet';
-}
-function format(s){return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0')}
+document.getElementById('selectTree').onclick=selectTree;
+document.getElementById('chop').onclick=chop;
+document.getElementById('floor').onclick=()=>place('floor');
+document.getElementById('wall').onclick=()=>place('wall');
+document.getElementById('ramp').onclick=()=>place('ramp');
+document.getElementById('ladder').onclick=()=>place('ladder');
+document.querySelectorAll('.template').forEach(el=>el.onclick=()=>placeTemplate(el.dataset.template));
+document.getElementById('fire').onclick=()=>{if(wood<5){showMessage('Need 5 planks for a campfire');return}wood-=5;document.getElementById('wood').textContent=wood+' planks';buildPiece('fire',player.position.x+2,0,player.position.z+2);showMessage('Campfire built!')};
+document.getElementById('car').onclick=()=>{vehicle.visible=!vehicle.visible;showMessage(vehicle.visible?'Your getaway vehicle is ready.':'Vehicle hidden.')};
+document.getElementById('weatherBtn').onclick=()=>{weatherMode=(weatherMode+1)%3;document.getElementById('weather').textContent=['CLEAR','RAIN','WIND'][weatherMode];scene.fog.density=weatherMode===1?.014:.008;showMessage('Weather changed.')};
+document.getElementById('leave').onclick=()=>location.reload();
 
-function spawnAnimal(){
- let a=new THREE.Group();
- let body=sphere(0,1,0,1,mats.dark,a);body.scale.set(1.6,.7,.7);
- let head=sphere(1,1.3,0,.55,mats.dark,a);
- for(let z of [-.35,.35]){
-  let leg=cube(-.5,.45,z,.2,.8,.2,mats.dark,a);
-  let leg2=cube(.6,.45,z,.2,.8,.2,mats.dark,a);
- }
- a.position.set(player.x+rand(45,65),0,player.z+rand(-20,20));
- a.userData={speed:rand(1.2,2.3),scared:0};
- scene.add(a);animals.push(a);
- notify('🐾 A predator has entered the area!');
+document.querySelectorAll('[data-choice]').forEach(el=>el.onclick=()=>{
+ document.querySelectorAll('[data-choice]').forEach(x=>x.classList.remove('selected'));el.classList.add('selected');character=el.dataset.choice;
+});
+document.querySelectorAll('[data-world]').forEach(el=>el.onclick=()=>{
+ document.querySelectorAll('[data-world]').forEach(x=>x.classList.remove('selected'));el.classList.add('selected');biome=el.dataset.world;
+});
+document.getElementById('start').onclick=()=>{
+ document.getElementById('setup').style.display='none';started=true;
+ scene.remove(player);const newPlayer=makePerson(character==='girl');player.children.forEach(c=>player.remove(c));player.add(newPlayer);newPlayer.position.set(0,0,0);
+ if(biome==='mountain'){ground.material=snowMat;scene.background=new THREE.Color(0xb6cbd8);scene.fog.color.set(0xb6cbd8);scene.fog.density=.006}
+ if(biome==='windy'){scene.background=new THREE.Color(0xa2b3a6);scene.fog.color.set(0xa2b3a6)}
+ showMessage('You have 20 minutes to prepare. Good luck!');
+};
+
+const predatorGroup=new THREE.Group();scene.add(predatorGroup);let predator=null,predatorTimer=0;
+function spawnPredator(){
+ const g=new THREE.Group(),fur=mat(0x392f2a),eye=mat(0xffb43b);
+ const body=new THREE.Mesh(new THREE.BoxGeometry(1.2,.8,2),fur);body.position.y=.8;body.castShadow=true;g.add(body);
+ const head=new THREE.Mesh(new THREE.BoxGeometry(.8,.7,.8),fur);head.position.set(0,1.1,-1);g.add(head);
+ for(let x of [-.25,.25]){const e=new THREE.Mesh(new THREE.SphereGeometry(.08),eye);e.position.set(x,1.3,-1.4);g.add(e)}
+ for(let x of [-.4,.4])for(let z of [-.65,.65]){const leg=new THREE.Mesh(new THREE.BoxGeometry(.2,.7,.2),fur);leg.position.set(x,.35,z);g.add(leg)}
+ g.position.set(random(-45,45),0,random(-45,45));scene.add(g);predator=g;showMessage('WARNING: A predator is roaming nearby!');
 }
-function jump(){if(playerGroup.position.y<.1)return;velocity.y=9}
-function movePlayer(n){player.x+=n*2}
-function endGame(){
- if(ended)return;ended=true;running=false;
- let score=Math.floor(elapsed);
- records.push({name:character==='boy'?'Boy survivor':'Girl survivor',time:score});
- records.sort((a,b)=>b.time-a.time);records=records.slice(0,10);
- try{localStorage.setItem('wildwood3records',JSON.stringify(records))}catch(e){}
- alert('Expedition over! You survived '+format(score)+'. Your record has been saved.');
- location.reload();
+let last=performance.now(),survival=0;
+function updatePlayer(dt){
+ const forward=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw));
+ const right=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));
+ const move=new THREE.Vector3();
+ if(keys.KeyW)move.add(forward);if(keys.KeyS)move.sub(forward);if(keys.KeyD)move.add(right);if(keys.KeyA)move.sub(right);
+ const moving=move.lengthSq()>0;
+ if(moving){move.normalize();const speed=keys.ShiftLeft||keys.ShiftRight?9:5;player.position.addScaledVector(move,speed*dt);player.rotation.y=Math.atan2(move.x,move.z)}
+ velocityY-=18*dt;player.position.y+=velocityY*dt;
+ if(player.position.y<=0){player.position.y=0;velocityY=0;onGround=true}
+ player.position.x=THREE.MathUtils.clamp(player.position.x,-115,115);player.position.z=THREE.MathUtils.clamp(player.position.z,-115,115);
+ const limbs=player.userData.limbs||[];
+ limbs.forEach((limb,i)=>{limb.rotation.x=moving?Math.sin(elapsed*10+i*Math.PI)*.65:0});
+ const target=new THREE.Vector3(player.position.x+Math.sin(yaw)*cameraDistance*Math.cos(pitch),player.position.y+3.2+Math.sin(pitch)*cameraDistance,player.position.z+Math.cos(yaw)*cameraDistance*Math.cos(pitch));
+ camera.position.lerp(target,1-Math.pow(.001,dt));camera.lookAt(player.position.x,player.position.y+1.2,player.position.z);
 }
-function onClick(e){
- if(!running)return;
- let rect=renderer.domElement.getBoundingClientRect();
- let mouse=new THREE.Vector2((e.clientX/innerWidth)*2-1,-(e.clientY/innerHeight)*2+1);
- let ray=new THREE.Raycaster();ray.setFromCamera(mouse,camera);
- let objects=trees.filter(t=>!t.cut).map(t=>t.group.children[0]);
- let hits=ray.intersectObjects(objects,true);
- if(hits.length){
-  let obj=hits[0].object;
-  let g=obj.parent;
-  while(g&&!g.userData.tree)g=g.parent;
-  if(g&&g.userData.tree){
-   selected=g.userData.tree;
-   $('treeList').innerText='Selected tree · '+selected.planks+' logs';
-   notify('Tree selected! Choose a design or start building.');
-   return;
-  }
- }
- if(buildMode){
-  let plane=new THREE.Plane(new THREE.Vector3(0,1,0),-5);
-  let point=new THREE.Vector3();
-  ray.ray.intersectPlane(plane,point);
-  if(point)buildAt(point);
+function updatePredator(dt){
+ if(elapsed>prep){predatorTimer+=dt;if(!predator&&predatorTimer>8)spawnPredator()}
+ if(predator){
+  const dir=player.position.clone().sub(predator.position);dir.y=0;
+  if(dir.length()>1){dir.normalize();predator.position.addScaledVector(dir,dt*2.4);predator.rotation.y=Math.atan2(dir.x,dir.z)}
+  if(predator.position.distanceTo(player.position)<1.8){health=Math.max(0,health-dt*12);document.getElementById('healthText').textContent=Math.round(health)+'%';document.getElementById('healthBar').style.width=health+'%'}
  }
 }
-function start(){
- $('start').style.display='none';
- setup3D();
- renderer.domElement.addEventListener('click',onClick);
- running=true;clock3=new THREE.Clock();
- updateHUD();animate();
- notify('Select a tree to begin constructing your shelter.');
+function updateUI(){
+ const remaining=Math.max(0,prep-elapsed),m=Math.floor(remaining/60),s=Math.floor(remaining%60);
+ document.getElementById('clock').textContent=remaining>0?`PREPARATION ${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`:'PREDATORS ACTIVE';
+ document.getElementById('survival').textContent=String(Math.floor(elapsed/60)).padStart(2,'0')+':'+String(Math.floor(elapsed%60)).padStart(2,'0');
 }
-function animate(){
- if(!running)return;
- requestAnimationFrame(animate);
- let dt=Math.min(clock3.getDelta(),.05);
- elapsed+=dt;
- let moving=false;
- if(keys.w||keys.ArrowUp){player.z-=dt*10;moving=true}
- if(keys.s||keys.ArrowDown){player.z+=dt*10;moving=true}
- if(keys.a||keys.ArrowLeft){player.x-=dt*10;moving=true}
- if(keys.d||keys.ArrowRight){player.x+=dt*10;moving=true}
- if(keys[' ']){if(playerGroup.position.y<.1)velocity.y=9}
- velocity.y-=22*dt;
- playerGroup.position.y=Math.max(0,playerGroup.position.y+velocity.y*dt);
- if(playerGroup.position.y===0)velocity.y=0;
- playerGroup.position.x=player.x;
- playerGroup.position.z=player.z;
- if(driving){
-  vehicle.position.x=player.x;vehicle.position.z=player.z-5;
- }
- // Follow camera
- let target=new THREE.Vector3(player.x+13,playerGroup.position.y+11,player.z+18);
- camera.position.lerp(target,.07);
- camera.lookAt(player.x,playerGroup.position.y+3,player.z);
- // Wind movement
- trees.forEach(t=>{
-  t.group.rotation.z=Math.sin(elapsed*1.2+t.x)*.012;
- });
- leaves.forEach(l=>{
-  l.position.x-=dt*8;
- });
- if(biome==='wind'||biome==='forest'){
-  // foliage sway
-  scene.traverse(o=>{
-   if(o.userData.leaf&&o.geometry) o.rotation.z=Math.sin(elapsed*2+o.position.x)*.04;
-  });
- }
- rain.forEach(r=>{
-  r.position.y-=dt*25;
-  r.position.x-=dt*3;
-  if(r.position.y<0){r.position.y=40;r.position.x=player.x+rand(-50,50)}
- });
- // Predators
- if(elapsed>=prepTime&&Math.floor(elapsed)%28===0&&Math.floor(elapsed-dt)%28!==0)spawnAnimal();
- animals.forEach(a=>{
-  let scared=a.userData.scared>0;
-  if(scared)a.userData.scared-=dt;
-  let dx=player.x-a.position.x,dz=player.z-a.position.z;
-  let d=Math.hypot(dx,dz);
-  if(!scared&&d>3){a.position.x+=Math.sign(dx)*a.userData.speed*dt;a.position.z+=Math.sign(dz)*a.userData.speed*dt}
-  if(!scared&&d<2.3)health-=dt*12;
- });
- if(health<=0)endGame();
- // Every simulated hour, force an expedition
- let hour=Math.floor((elapsed-prepTime)/3600);
- if(elapsed>=prepTime&&hour>lastHour){
-  lastHour=hour;notify('⏰ One hour survived! Leave your shelter and gather supplies.');
- }
- // Day and weather
- let daylight=(Math.sin(elapsed*.015)+1)/2;
- scene.traverse(o=>{if(o.isDirectionalLight)o.intensity=1.2+daylight});
- if(Math.floor(elapsed)%5===0&&Math.floor(elapsed-dt)%5!==0)updateHUD();
+function animate(now){
+ requestAnimationFrame(animate);const dt=Math.min((now-last)/1000,.04);last=now;
+ if(started){elapsed+=dt;updatePlayer(dt);updatePredator(dt);updateUI()}
  renderer.render(scene,camera);
 }
-addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(e.key===' ')e.preventDefault()});
-addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
-addEventListener('resize',()=>{
- if(!renderer)return;
- camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
- renderer.setSize(innerWidth,innerHeight);
-});
-addEventListener('wheel',e=>{
- if(!camera)return;
- zoom=Math.max(.6,Math.min(1.8,zoom+e.deltaY*.001));
- camera.fov=65*zoom;camera.updateProjectionMatrix();
-});
+requestAnimationFrame(animate);
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 </script>
 </body>
 </html>
