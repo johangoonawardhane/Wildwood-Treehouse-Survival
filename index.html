@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WILDWOOD | Treehouse Survival</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#101a17;color:white;font-family:Arial,sans-serif;overflow:hidden}
+button,select{font:inherit}
+button{background:#294b36;color:white;border:1px solid #64836b;border-radius:9px;padding:10px 13px;cursor:pointer;font-weight:bold}
+button:hover{background:#47734e}
+button.active{background:#c58c39;color:#17130c}
+#game{display:block;width:100vw;height:100vh}
+#hud{position:absolute;inset:0;pointer-events:none}
+.panel{background:#101b18df;border:1px solid #56715c;border-radius:12px;padding:12px;pointer-events:auto;box-shadow:0 5px 20px #0005}
+#top{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+#resources{display:flex;gap:12px;flex-wrap:wrap;font-size:14px}
+#tools{position:absolute;bottom:12px;left:12px;display:flex;gap:7px;flex-wrap:wrap;max-width:75%}
+#tools button{font-size:12px}
+#buildPanel{position:absolute;right:12px;top:100px;width:205px;display:grid;gap:7px}
+#buildPanel button{width:100%}
+#message{position:absolute;top:100px;left:50%;transform:translateX(-50%);background:#14231eea;padding:12px 20px;border-radius:10px;display:none;text-align:center;max-width:90%;pointer-events:none}
+#start{position:absolute;inset:0;background:linear-gradient(#08140bc9,#08140beF),radial-gradient(circle at center,#527b4d,#101a17);display:flex;align-items:center;justify-content:center;padding:15px;z-index:5}
+#start .box{max-width:620px;width:100%;background:#17271f;border:1px solid #779276;border-radius:20px;padding:25px;text-align:center;max-height:95vh;overflow:auto}
+h1{font-size:clamp(35px,8vw,65px);margin:5px;color:#d4e7b4;letter-spacing:3px}
+.subtitle{color:#b5c8a8}
+.choices{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:15px 0}
+.choice{min-width:130px;padding:16px;background:#263d2e}
+#instructions{font-size:13px;line-height:1.8;color:#cad9c6}
+#leader{position:absolute;bottom:12px;right:12px;width:205px;font-size:12px}
+#leader h3{margin:0 0 7px}
+#mobile{display:none;position:absolute;bottom:100px;right:15px;gap:5px;pointer-events:auto}
+#mobile button{padding:15px}
+@media(max-width:650px){
+#buildPanel{top:105px;width:135px}
+#buildPanel button{font-size:10px;padding:7px}
+#leader{display:none}
+#tools{max-width:100%;bottom:8px}
+#tools button{padding:7px;font-size:10px}
+#mobile{display:flex}
+#resources{font-size:11px}
+}
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="hud">
+ <div id="top">
+  <div class="panel">
+   <strong>🌲 WILDWOOD</strong>
+   <div id="resources">🪵 0 planks | 🪓 Axe | ⏱ 20:00</div>
+  </div>
+  <div class="panel" id="status">🌤 Wilderness awaits</div>
+ </div>
+
+ <div id="message"></div>
+
+ <div class="panel" id="buildPanel">
+  <strong>🏗️ BUILD MENU</strong>
+  <button onclick="setMode('floor')">▰ Flat floor</button>
+  <button onclick="setMode('ramp')">／ Ramp</button>
+  <button onclick="setMode('wall')">▥ Wall</button>
+  <button onclick="setMode('roof')">⌂ Roof</button>
+  <button onclick="setMode('ladder')">🪜 Ladder</button>
+  <button onclick="setMode('erase')">✖ Remove piece</button>
+  <button onclick="setMode('none')">✓ Finish building</button>
+  <hr>
+  <strong>STARTER DESIGNS</strong>
+  <button onclick="template('shelter')">🏕 Small shelter</button>
+  <button onclick="template('cabin')">🏡 Forest cabin</button>
+  <button onclick="template('lookout')">🔭 Lookout tower</button>
+ </div>
+
+ <div id="tools">
+  <button onclick="chop()">🪓 Chop tree</button>
+  <button onclick="collect()">🪵 Collect wood</button>
+  <button onclick="makeFire()">🔥 Build fire</button>
+  <button onclick="makePit()">🪨 Fire pit</button>
+  <button onclick="switchGear()">🛡️ Switch gadget</button>
+  <button onclick="useGear()">✨ Use gadget</button>
+  <button onclick="drive()">🚙 Vehicle</button>
+  <button onclick="changeWorld()">🌍 Environment</button>
+ </div>
+
+ <div class="panel" id="leader">
+  <h3>🏆 LOCAL SURVIVAL RECORDS</h3>
+  <div id="records">No records yet</div>
+ </div>
+ <div id="mobile">
+  <button onclick="move(-1)">◀</button>
+  <button onclick="move(1)">▶</button>
+  <button onclick="jump()">▲</button>
+ </div>
+</div>
+
+<div id="start">
+ <div class="box">
+  <h1>WILDWOOD</h1>
+  <h2>🌲 TREEHOUSE SURVIVAL 🌲</h2>
+  <p class="subtitle">Your wilderness. Your treehouse. Your survival.</p>
+  <h3>Choose your character</h3>
+  <div class="choices">
+   <button class="choice" onclick="chooseCharacter('boy')">🧑‍🌾<br>Boy</button>
+   <button class="choice" onclick="chooseCharacter('girl')">👩‍🌾<br>Girl</button>
+  </div>
+  <h3>Choose your wilderness</h3>
+  <div class="choices">
+   <button class="choice" onclick="chooseWorld('forest')">🌲<br>Deep forest</button>
+   <button class="choice" onclick="chooseWorld('mountain')">🏔️<br>Snowy mountain</button>
+   <button class="choice" onclick="chooseWorld('windy')">🌬️<br>Windy wilderness</button>
+  </div>
+  <div id="instructions">
+   <b>YOUR MISSION</b><br>
+   1. Find a suitable tree and select it.<br>
+   2. Choose a starter treehouse design.<br>
+   3. Chop trees and collect unlimited-carry planks.<br>
+   4. Build your dream shelter before predators arrive.<br>
+   5. Survive, explore and set a new record.<br><br>
+   <b>CONTROLS</b><br>
+   A/D or arrow keys: Move | Space: Jump<br>
+   Click trees to select them. Click the world to build.<br>
+   <br>Predator encounters use fictional, non-graphic survival mechanics.
+  </div>
+  <br>
+  <button style="font-size:19px;padding:15px 40px" onclick="startGame()">ENTER THE WILDERNESS →</button>
+ </div>
+</div>
+
+<script>
+const canvas=document.getElementById('game');
+const ctx=canvas.getContext('2d');
+let W,H;
+function resize(){W=canvas.width=innerWidth*devicePixelRatio;H=canvas.height=innerHeight*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);W=innerWidth;H=innerHeight}
+addEventListener('resize',resize);resize();
+
+let game=false,character='boy',world='forest';
+let player={x:250,y:0,vy:0,ground:true};
+let trees=[],pieces=[],leaves=[],rain=[],predators=[];
+let selected=null,planks=0,logs=0,mode='none';
+let seconds=0,prep=1200,gear=0,vehicle=false;
+let fire=false,pit=false,gameOver=false,clock=0;
+let weather='clear',messageTimer=0,worldWidth=5000;
+let last=performance.now(),camera=0;
+let records=[];
+try{records=JSON.parse(localStorage.getItem('wildwoodRecords')||'[]')}catch(e){}
+const gears=['Noise beacon','Signal flare','Decoy device'];
+const gearEmoji=['📢','✨','🎭'];
+
+function chooseCharacter(c){character=c;document.querySelectorAll('.choice').forEach(b=>b.style.borderColor='#64836b')}
+function chooseWorld(w){world=w}
+function startGame(){
+ game=true;document.getElementById('start').style.display='none';
+ generateWorld();player.x=250;player.y=groundAt(player.x)-35;
+ say('Welcome to the wilderness. Find your perfect tree!');
+ updateHUD();
+}
+function groundAt(x){return H-90+Math.sin(x*.003)*12}
+function generateWorld(){
+ trees=[];pieces=[];predators=[];leaves=[];
+ for(let x=100;x<worldWidth;x+=110+Math.random()*90){
+  trees.push({x,h:120+Math.random()*110,r:22+Math.random()*15,cut:false});
+ }
+ for(let i=0;i<90;i++)leaves.push({x:Math.random()*worldWidth,y:Math.random()*H,s:2+Math.random()*4,v:1+Math.random()*2});
+}
+function say(t){
+ let m=document.getElementById('message');m.innerText=t;m.style.display='block';messageTimer=3.5;
+}
+function setMode(m){mode=m;say(m==='none'?'Building finished':`Building mode: ${m}. Click where you want to place it.`)}
+function closestTree(){
+ return trees.filter(t=>!t.cut).sort((a,b)=>Math.abs(a.x-player.x)-Math.abs(b.x-player.x))[0];
+}
+function chop(){
+ let t=closestTree();
+ if(!t||Math.abs(t.x-player.x)>100){say('Move closer to a tree first!');return}
+ t.cut=true;logs+=4;planks+=8;
+ say('Tree chopped! 🌲 Converted into 8 planks.');
+ updateHUD();
+}
+function collect(){
+ let t=closestTree();
+ if(t&&Math.abs(t.x-player.x)<120&&!t.cut){say('Chop the tree first!');return}
+ planks+=4;say('Collected 4 spare planks.');updateHUD();
+}
+function selectTree(t){
+ selected=t;
+ say('Tree selected! Choose a starter design or build from scratch.');
+}
+function template(type){
+ if(!selected){say('Select a tree before choosing a design!');return}
+ const x=selected.x,y=groundAt(x)-selected.h;
+ let sets={
+ shelter:[[0,0,'floor'],[45,0,'floor'],[-45,0,'floor'],[0,-45,'wall'],[45,-45,'wall'],[-45,-45,'wall']],
+ cabin:[[0,0,'floor'],[45,0,'floor'],[90,0,'floor'],[-45,0,'floor'],[0,-45,'wall'],[45,-45,'wall'],[-45,-45,'wall'],[90,-45,'wall'],[0,-90,'roof'],[45,-90,'roof']],
+ lookout:[[0,0,'floor'],[45,0,'floor'],[-45,0,'floor'],[0,-45,'wall'],[45,-45,'wall'],[-45,-45,'wall'],[0,-90,'floor'],[45,-90,'floor']]
+ };
+ let arr=sets[type];
+ if(planks<arr.length*2){say('Not enough planks! Chop some more trees.');return}
+ arr.forEach(p=>pieces.push({x:x+p[0],y:y+p[1],type:p[2],tree:selected.x}));
+ planks-=arr.length*2;
+ say('Your starter design is ready! Expand it however you like.');
+ updateHUD();
+}
+function buildAt(x,y){
+ if(!selected){say('Choose a tree first!');return}
+ if(mode==='none')return;
+ if(mode==='erase'){
+  let i=pieces.findIndex(p=>Math.hypot(p.x-x,p.y-y)<35);
+  if(i>=0){pieces.splice(i,1);planks+=2;say('Piece removed. 2 planks returned.')}
+  return;
+ }
+ if(planks<2){say('You need more planks!');return}
+ pieces.push({x,y,type:mode,tree:selected.x});
+ planks-=2;updateHUD();
+}
+function makeFire(){
+ if(planks<3){say('You need 3 planks for a fire!');return}
+ if(fire){say('Your fire is already burning!');return}
+ fire=true;planks-=3;say('🔥 Campfire created!');updateHUD();
+}
+function makePit(){
+ if(planks<4){say('You need 4 planks for a fire pit!');return}
+ if(pit){say('You already have a fire pit!');return}
+ pit=true;planks-=4;say('🪨 Fire pit created!');updateHUD();
+}
+function switchGear(){gear=(gear+1)%gears.length;say('Selected: '+gears[gear]);updateHUD()}
+function useGear(){
+ if(seconds<prep){say('Save your gadgets for predator encounters!');return}
+ say(gears[gear]+' activated! Nearby predators are distracted.');
+ predators.forEach(p=>p.distracted=7);
+}
+function drive(){
+ vehicle=!vehicle;
+ say(vehicle?'🚙 Getaway vehicle ready! Use A/D to drive.':'You left your vehicle.');
+}
+function changeWorld(){
+ world=world==='forest'?'mountain':world==='mountain'?'windy':'forest';
+ say('Environment changed: '+world+'.');
+}
+function move(n){player.x=Math.max(20,Math.min(worldWidth-20,player.x+n*35))}
+function jump(){if(player.ground){player.vy=-12;player.ground=false}}
+function updateHUD(){
+ document.getElementById('resources').innerText=
+ `🪵 ${planks} planks | ${gearEmoji[gear]} ${gears[gear]} | ⏱ ${Math.max(0,Math.ceil(prep-seconds))>0?format(Math.max(0,prep-seconds)):'SURVIVE!'}`;
+ document.getElementById('status').innerText=
+ seconds<prep?'🛠 Preparation time':`🐾 Predators active | Survival: ${format(seconds-prep)}`;
+ document.getElementById('records').innerHTML=records.slice(0,5).map((r,i)=>`${i+1}. ${r.name}: ${format(r.time)}`).join('<br>')||'No records yet';
+}
+function format(s){return Math.floor(s/60).toString().padStart(2,'0')+':'+Math.floor(s%60).toString().padStart(2,'0')}
+function endGame(){
+ if(gameOver)return;
+ gameOver=true;game=false;
+ records.push({name:character==='boy'?'Boy survivor':'Girl survivor',time:Math.floor(seconds)});
+ records.sort((a,b)=>b.time-a.time);records=records.slice(0,10);
+ try{localStorage.setItem('wildwoodRecords',JSON.stringify(records))}catch(e){}
+ alert('Your expedition ended! Survival time: '+format(seconds)+'. Your record has been saved.');
+ document.getElementById('start').style.display='flex';
+ document.querySelector('#start h2').innerText='EXPEDITION COMPLETE';
+}
+function spawnPredator(){
+ predators.push({x:camera+W+100,y:groundAt(camera+W+100),distracted:0});
+ say('🐾 Something is approaching from the forest...');
+}
+function drawTree(t){
+ let x=t.x-camera,y=groundAt(t.x);
+ if(x<-100||x>W+100)return;
+ if(t.cut){ctx.fillStyle='#795535';ctx.fillRect(x-12,y-25,24,25);return}
+ ctx.fillStyle='#503a27';ctx.fillRect(x-9,y-t.h,18,t.h);
+ ctx.fillStyle=world==='mountain'?'#315047':'#214b2c';
+ for(let i=0;i<4;i++){
+  ctx.beginPath();ctx.moveTo(x,y-t.h-45+i*35);ctx.lineTo(x-55+i*5,y-t.h+35+i*15);ctx.lineTo(x+55-i*5,y-t.h+35+i*15);ctx.closePath();ctx.fill();
+ }
+ if(selected===t){ctx.strokeStyle='#e9ce72';ctx.lineWidth=3;ctx.strokeRect(x-60,y-t.h-60,120,t.h+65)}
+}
+function drawPlayer(){
+ let x=player.x-camera,y=player.y;
+ ctx.fillStyle='#202b24';ctx.fillRect(x-11,y-22,22,25);
+ ctx.fillStyle=character==='boy'?'#466e80':'#8e5772';
+ ctx.fillRect(x-12,y-43,24,24);
+ ctx.fillStyle='#c69a70';ctx.beginPath();ctx.arc(x,y-53,11,0,7);ctx.fill();
+ ctx.fillStyle='#493624';ctx.fillRect(x-11,y-64,22,7);
+ ctx.fillStyle='#d8d8d0';ctx.fillRect(x-8,y-15,7,17);ctx.fillRect(x+2,y-15,7,17);
+}
+function draw(){
+ ctx.clearRect(0,0,W,H);
+ let sky=world==='mountain'?'#91b7c7':world==='windy'?'#839a9c':'#789b81';
+ let grad=ctx.createLinearGradient(0,0,0,H);grad.addColorStop(0,sky);grad.addColorStop(1,'#d3d5ad');
+ ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
+ // mountains
+ ctx.fillStyle=world==='mountain'?'#e7f1f0':'#526f58';
+ for(let i=0;i<7;i++){
+  let x=i*250-camera*.2;
+  ctx.beginPath();ctx.moveTo(x-100,H-90);ctx.lineTo(x+80,100+(i%3)*40);ctx.lineTo(x+270,H-90);ctx.fill();
+ }
+ // ground
+ ctx.fillStyle=world==='mountain'?'#dce8df':'#536b3c';
+ ctx.fillRect(0,H-90,W,90);
+ ctx.fillStyle='#344b2d';ctx.fillRect(0,H-90,W,7);
+ trees.forEach(drawTree);
+ // treehouse pieces
+ pieces.forEach(p=>{
+  let x=p.x-camera,y=p.y;
+  if(x<-100||x>W+100)return;
+  ctx.save();ctx.translate(x,y);
+  ctx.fillStyle=p.type==='wall'?'#9c7042':p.type==='roof'?'#62452d':'#b78953';
+  if(p.type==='floor')ctx.fillRect(-24,-7,48,14);
+  if(p.type==='wall')ctx.fillRect(-20,-42,40,42);
+  if(p.type==='ramp'){ctx.beginPath();ctx.moveTo(-25,0);ctx.lineTo(25,-30);ctx.lineTo(25,-20);ctx.lineTo(-25,10);ctx.fill()}
+  if(p.type==='roof'){ctx.beginPath();ctx.moveTo(-28,0);ctx.lineTo(0,-28);ctx.lineTo(28,0);ctx.fill()}
+  if(p.type==='ladder'){ctx.fillRect(-18,-55,5,55);ctx.fillRect(13,-55,5,55);for(let i=0;i<5;i++)ctx.fillRect(-18,-i*12-5,36,3)}
+  ctx.restore();
+ });
+ // fire
+ if(fire){let x=selected?selected.x-camera:player.x-camera;
+ ctx.fillStyle='#ff9b27';ctx.beginPath();ctx.arc(x,H-105,9+Math.sin(clock*7)*3,0,7);ctx.fill();
+ ctx.fillStyle='#ffe5a0';ctx.beginPath();ctx.arc(x,H-105,4,0,7);ctx.fill()}
+ if(pit){ctx.strokeStyle='#a7a49a';ctx.lineWidth=5;ctx.beginPath();ctx.arc((selected?.x||player.x)-camera,H-103,20,0,7);ctx.stroke()}
+ // leaves
+ ctx.fillStyle='#9bbd62';
+ leaves.forEach(l=>{
+  ctx.beginPath();ctx.ellipse(l.x-camera,l.y,l.s,l.s*.55,clock,0,7);ctx.fill();
+ });
+ // rain
+ if(weather==='rain'){
+  ctx.strokeStyle='#b6d4df99';ctx.lineWidth=1;
+  for(let i=0;i<100;i++){let x=(i*97+clock*240)%W,y=(i*57+clock*400)%H;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-5,y+13);ctx.stroke()}
+ }
+ // vehicle
+ if(vehicle){
+  let x=player.x-camera;
+  ctx.fillStyle='#a94e32';ctx.fillRect(x-45,H-130,90,30);
+  ctx.fillStyle='#293b36';ctx.fillRect(x-30,H-140,48,20);
+  ctx.fillStyle='#111';for(let a of [-28,28]){ctx.beginPath();ctx.arc(x+a,H-98,10,0,7);ctx.fill()}
+ }
+ predators.forEach(p=>{
+  let x=p.x-camera;
+  ctx.fillStyle='#26251f';ctx.beginPath();ctx.ellipse(x,H-115,23,13,0,0,7);ctx.fill();
+  ctx.beginPath();ctx.arc(x+12,H-128,12,0,7);ctx.fill();
+  ctx.fillStyle='#e4c65b';ctx.fillRect(x+18,H-130,3,3);
+ });
+ drawPlayer();
+}
+function update(dt){
+ if(!game)return;
+ clock+=dt;seconds+=dt;
+ prep=Math.max(0,prep);
+ if(seconds>=1200&&Math.floor(seconds)%35<dt)spawnPredator();
+ if(seconds>1200){
+  predators.forEach(p=>{
+   if(p.distracted>0)p.distracted-=dt;
+   else p.x-=dt*17;
+   if(p.x<player.x+30&&Math.abs(p.x-player.x)<45&&player.y>groundAt(player.x)-100)endGame();
+  });
+  predators=predators.filter(p=>p.x>camera-100);
+ }
+ player.vy+=25*dt;player.y+=player.vy;
+ let floor=groundAt(player.x)-35;
+ if(player.y>=floor){player.y=floor;player.vy=0;player.ground=true}
+ else player.ground=false;
+ camera=Math.max(0,Math.min(worldWidth-W,player.x-W*.4));
+ leaves.forEach(l=>{l.x-=dt*(world==='windy'?80:25);if(l.x<camera-20)l.x=camera+W+Math.random()*100});
+ if(Math.random()<dt*.015)weather=Math.random()<.5?'rain':'clear';
+ if(weather==='rain'&&Math.random()<dt*.08)weather='clear';
+ if(messageTimer>0){messageTimer-=dt;if(messageTimer<=0)document.getElementById('message').style.display='none'}
+ updateHUD();
+}
+function loop(now){
+ let dt=Math.min(.05,(now-last)/1000);last=now;
+ update(dt);draw();requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+addEventListener('keydown',e=>{
+ if(!game)return;
+ if(e.key==='a'||e.key==='ArrowLeft')move(-1);
+ if(e.key==='d'||e.key==='ArrowRight')move(1);
+ if(e.key===' '){e.preventDefault();jump()}
+});
+canvas.addEventListener('click',e=>{
+ if(!game)return;
+ let x=e.clientX+camera,y=e.clientY;
+ if(mode!=='none'&&selected){buildAt(x,y);return}
+ let t=trees.find(t=>!t.cut&&Math.abs(t.x-x)<55&&Math.abs(groundAt(t.x)-t.h-y)<100);
+ if(t){selectTree(t);return}
+ if(selected)buildAt(x,y);
+});
+</script>
+</body>
+</html>
