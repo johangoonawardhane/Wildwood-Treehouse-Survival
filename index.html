@@ -3,862 +3,1235 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WILDWOOD — Survival</title>
+<title>WILDWOOD — The Long Night</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap');
-
-:root {
-  --gold: #d8b66b;
-  --glass: rgba(13,22,19,.82);
-  --border: rgba(226,207,159,.22);
-  --white: #f2f0e9;
-}
-* { box-sizing:border-box; }
-html,body { margin:0; width:100%; height:100%; overflow:hidden; background:#101713; color:var(--white); font-family:'DM Sans',sans-serif; }
-canvas { display:block; }
-#game { position:fixed; inset:0; }
-#screen {
-  position:fixed; inset:0; z-index:5;
-  display:flex; align-items:center; justify-content:center;
-  background:linear-gradient(90deg,rgba(5,12,9,.92),rgba(5,12,9,.48),rgba(5,12,9,.12)),
-  url('https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=2200&q=85') center/cover;
-}
-.menu {
-  width:min(650px,92vw); padding:35px 38px;
-  background:linear-gradient(145deg,rgba(12,23,18,.94),rgba(9,15,13,.82));
-  border:1px solid var(--border); box-shadow:0 25px 100px #0009;
-  backdrop-filter:blur(14px);
-}
-.eyebrow { color:var(--gold); letter-spacing:5px; font-size:11px; font-weight:700; }
-.logo { font-family:'Barlow Condensed',sans-serif; font-size:clamp(65px,11vw,110px); line-height:.85; font-weight:800; letter-spacing:-3px; margin:15px 0; }
-.logo span { color:var(--gold); }
-.subtitle { color:#b8c0b8; line-height:1.6; max-width:450px; font-size:14px; }
-.menu-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:25px 0; }
-.menu-option { border:1px solid var(--border); padding:14px; background:#ffffff08; }
-.menu-option label { display:block; color:#b6bdb4; font-size:10px; text-transform:uppercase; letter-spacing:2px; margin-bottom:9px; }
-select { width:100%; background:#17241d; border:1px solid #536254; color:white; padding:10px; font:inherit; }
-.primary {
-  width:100%; border:0; padding:17px; background:var(--gold); color:#171b15;
-  font-weight:800; letter-spacing:3px; cursor:pointer; transition:.2s;
-}
-.primary:hover { background:#f1d28a; transform:translateY(-2px); }
-.smallprint { color:#7d8a7f; font-size:10px; margin-top:15px; line-height:1.5; }
-#hud { display:none; position:fixed; inset:0; pointer-events:none; z-index:3; }
-.topbar { position:absolute; top:18px; left:20px; right:20px; display:flex; justify-content:space-between; align-items:flex-start; }
-.brand { font-family:'Barlow Condensed'; font-size:29px; font-weight:800; letter-spacing:2px; text-shadow:0 2px 8px #000; }
-.brand span { color:var(--gold); }
-.status { display:flex; gap:8px; }
-.stat { background:var(--glass); border:1px solid var(--border); padding:9px 13px; min-width:95px; backdrop-filter:blur(8px); }
-.stat small { display:block; font-size:9px; letter-spacing:2px; color:#aab4a8; }
-.stat strong { font-size:14px; }
-#objective { position:absolute; top:90px; left:20px; width:230px; background:var(--glass); border:1px solid var(--border); padding:15px; }
-#objective h3 { margin:0 0 8px; color:var(--gold); font-family:'Barlow Condensed'; letter-spacing:2px; font-size:18px; }
-#objective p { margin:0; font-size:12px; color:#c4cdc3; line-height:1.5; }
-#resources { position:absolute; bottom:20px; left:20px; display:flex; gap:7px; }
-.resource { background:var(--glass); border:1px solid var(--border); padding:9px 12px; font-size:12px; }
-.resource b { color:var(--gold); margin-left:5px; }
-#controls { position:absolute; bottom:20px; right:20px; padding:12px 15px; background:var(--glass); border:1px solid var(--border); font-size:10px; color:#c6cec4; line-height:1.8; }
-#controls b { color:var(--gold); }
-#crosshair { position:absolute; top:50%; left:50%; width:7px; height:7px; border:1px solid #fff; border-radius:50%; transform:translate(-50%,-50%); opacity:.8; }
-#message { position:absolute; top:68%; left:50%; transform:translateX(-50%); background:#101b15dd; padding:10px 18px; border:1px solid var(--border); font-size:12px; opacity:0; transition:.2s; }
-#buildpanel { display:none; position:absolute; top:50%; right:20px; transform:translateY(-50%); background:var(--glass); border:1px solid var(--border); padding:15px; width:190px; pointer-events:auto; }
-#buildpanel h3 { margin:0 0 12px; font-family:'Barlow Condensed'; color:var(--gold); letter-spacing:2px; }
-.buildbutton { display:block; width:100%; margin:6px 0; padding:10px; background:#ffffff0c; border:1px solid var(--border); color:white; text-align:left; cursor:pointer; }
-.buildbutton.active { background:#b8944b33; border-color:var(--gold); }
-#damage { position:absolute; inset:0; border:0 solid rgba(170,30,20,0); pointer-events:none; }
-#help { position:fixed; z-index:6; bottom:10px; left:50%; transform:translateX(-50%); color:#b8c2b7; font-size:10px; text-shadow:0 2px 4px #000; pointer-events:none; }
-@media(max-width:650px) {
- .menu { padding:24px; }
- .menu-grid { grid-template-columns:1fr; }
- #objective { top:85px; width:175px; }
- .stat { min-width:65px; padding:7px; }
- .stat strong { font-size:11px; }
- #controls { display:none; }
- #resources { flex-wrap:wrap; max-width:190px; }
+:root{--gold:#d7b477;--glass:rgba(12,18,15,.84);--line:rgba(222,201,158,.24)}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101713;color:#f3eee2;font-family:Inter,Segoe UI,Arial,sans-serif}
+canvas{display:block}
+#screen{position:fixed;inset:0;pointer-events:none}
+#top{position:absolute;top:18px;left:20px;right:20px;display:flex;justify-content:space-between;align-items:flex-start}
+.brand{font-size:13px;letter-spacing:5px;color:#e3c58e;font-weight:800;text-shadow:0 2px 12px #000}
+.brand small{display:block;margin-top:6px;color:#b8b7a9;font-size:9px;letter-spacing:3px;font-weight:500}
+.panel{background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(12px);border-radius:12px;padding:12px 15px;box-shadow:0 10px 35px #0005}
+#stats{display:flex;gap:8px}
+.stat{min-width:85px;text-align:center}
+.stat b{display:block;font-size:17px;color:#e7d2a8}
+.stat span{font-size:9px;letter-spacing:2px;color:#a8aa9e}
+#objective{position:absolute;left:20px;top:90px;width:245px}
+.eyebrow{font-size:9px;letter-spacing:3px;color:var(--gold);margin-bottom:8px}
+#objective strong{font-size:14px;display:block;margin-bottom:5px}
+#objective p{font-size:11px;line-height:1.6;color:#b9bcb1;margin:0}
+#bottom{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);display:flex;gap:8px;align-items:center}
+.key{border:1px solid #ffffff40;background:#111a15d9;border-radius:6px;padding:8px 11px;font-size:10px;color:#dcd8ca;white-space:nowrap}
+.key b{color:#e5c78f}
+#message{position:absolute;left:50%;top:22%;transform:translateX(-50%);font-size:12px;letter-spacing:2px;color:#f1d7a5;text-shadow:0 2px 8px #000;opacity:0;transition:opacity .25s}
+#crosshair{position:absolute;left:50%;top:50%;width:7px;height:7px;border:1px solid #eee9;border-radius:50%;transform:translate(-50%,-50%)}
+#buildPanel{position:absolute;right:20px;top:100px;width:210px;display:none;pointer-events:auto}
+#buildPanel button,#menu button{width:100%;border:1px solid var(--line);background:#26342b;color:#eee7d8;padding:11px;margin-top:7px;border-radius:6px;cursor:pointer;text-align:left}
+#buildPanel button:hover,#menu button:hover{background:#40513f}
+#buildPanel button.active{border-color:var(--gold);color:#f4d9a2}
+#vehicleHud{position:absolute;bottom:85px;left:50%;transform:translateX(-50%);display:none;text-align:center}
+#vehicleHud strong{font-size:24px;color:#ead2a3}
+#vehicleHud span{display:block;font-size:9px;letter-spacing:3px;color:#aaa}
+#menu{position:fixed;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;background:linear-gradient(90deg,#07100de8,#07100d9c 50%,#07100d70),linear-gradient(0deg,#07100dbb,transparent 70%)}
+.menuBox{width:min(560px,90vw);padding:34px;border:1px solid #c5ad7b55;background:#0c1512e8;backdrop-filter:blur(18px);box-shadow:0 20px 90px #0009}
+.menuTitle{font-size:clamp(38px,7vw,72px);letter-spacing:7px;line-height:.95;font-weight:900;color:#e7d2a8}
+.menuSub{font-size:10px;letter-spacing:4px;color:#a9b0a2;margin:14px 0 25px}
+.menuText{font-size:13px;color:#c1c5b9;line-height:1.7}
+#start{background:#c5a36c!important;color:#172018!important;font-weight:800!important;letter-spacing:2px;text-align:center!important;padding:15px!important}
+#loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#101713;z-index:10;letter-spacing:4px;color:#dfc28e}
+#toast{position:absolute;bottom:95px;left:50%;transform:translateX(-50%);padding:10px 16px;background:#101713df;border:1px solid var(--line);border-radius:8px;font-size:11px;opacity:0;transition:opacity .2s}
+@media(max-width:700px){
+ #objective{top:85px;width:190px}
+ #stats{gap:3px}.stat{min-width:58px}
+ .stat span{font-size:7px}
+ #bottom{width:95%;justify-content:center;flex-wrap:wrap}
+ .key{padding:6px;font-size:9px}
+ .menuBox{padding:23px}
 }
 </style>
 </head>
 <body>
-<div id="game"></div>
+<div id="loading">PREPARING THE WILDERNESS…</div>
+
+<div id="menu">
+ <div class="menuBox">
+  <div class="eyebrow">A WILDERNESS SURVIVAL EXPERIENCE</div>
+  <div class="menuTitle">WILD<br>WOOD</div>
+  <div class="menuSub">THE LONG NIGHT</div>
+  <p class="menuText">
+   You have arrived in an isolated woodland. The weather is turning.
+   Find a safe place, gather supplies and build somewhere to survive
+   before darkness falls.
+  </p>
+  <p class="menuText">A large wilderness. A limited amount of daylight. Your decisions matter.</p>
+  <button id="start">ENTER THE WILDERNESS</button>
+  <p style="font-size:9px;color:#8f998d;letter-spacing:1px;margin-top:17px">
+   ARROW KEYS · SPACE TO JUMP · E TO INTERACT · B TO BUILD
+  </p>
+ </div>
+</div>
 
 <div id="screen">
- <div class="menu">
-  <div class="eyebrow">A WILDERNESS SURVIVAL EXPERIENCE</div>
-  <div class="logo">WILD<span>WOOD</span></div>
-  <p class="subtitle">Alone in the wilderness. Build your shelter. Explore the forest. Prepare for the night. Your survival begins here.</p>
-  <div class="menu-grid">
-   <div class="menu-option">
-    <label>Character</label>
-    <select id="character">
-     <option value="boy">Male survivor</option>
-     <option value="girl">Female survivor</option>
-    </select>
-   </div>
-   <div class="menu-option">
-    <label>Environment</label>
-    <select id="environment">
-     <option value="temperate">Temperate forest</option>
-     <option value="autumn">Autumn woodland</option>
-     <option value="pine">Mountain forest</option>
-    </select>
-   </div>
-   <div class="menu-option">
-    <label>Difficulty</label>
-    <select id="difficulty">
-     <option value="normal">Survival</option>
-     <option value="easy">Explorer</option>
-     <option value="hard">Hard survival</option>
-    </select>
-   </div>
-   <div class="menu-option">
-    <label>Starting equipment</label>
-    <select id="equipment">
-     <option value="basic">Basic survival kit</option>
-     <option value="builder">Builder's kit</option>
-     <option value="explorer">Explorer's kit</option>
-    </select>
-   </div>
+ <div id="top">
+  <div class="brand">WILDWOOD<small>FIELD SURVIVAL SYSTEM</small></div>
+  <div id="stats">
+   <div class="panel stat"><b id="clock">08:00</b><span>DAYLIGHT</span></div>
+   <div class="panel stat"><b id="wood">0</b><span>WOOD</span></div>
+   <div class="panel stat"><b id="stone">0</b><span>STONE</span></div>
   </div>
-  <button class="primary" id="start">ENTER THE WILDERNESS</button>
-  <div class="smallprint">WILDWOOD • EARLY DEVELOPMENT BUILD • Internet connection required to load the 3D engine.</div>
  </div>
-</div>
 
-<div id="hud">
- <div class="topbar">
-  <div class="brand">WILD<span>WOOD</span></div>
-  <div class="status">
-   <div class="stat"><small>TIME</small><strong id="clock">08:00</strong></div>
-   <div class="stat"><small>DAY</small><strong id="day">DAY 01</strong></div>
-   <div class="stat"><small>CONDITION</small><strong id="condition">STABLE</strong></div>
-  </div>
+ <div id="objective" class="panel">
+  <div class="eyebrow">CURRENT OBJECTIVE</div>
+  <strong id="objectiveTitle">Find your bearings</strong>
+  <p id="objectiveText">Explore the woodland. Find materials and choose a location for your shelter.</p>
  </div>
- <div id="objective">
-  <h3>YOUR FIRST DAY</h3>
-  <p id="objectiveText">Explore your surroundings. Collect wood and find a suitable place to build a shelter before nightfall.</p>
- </div>
- <div id="resources">
-  <div class="resource">WOOD <b id="wood">0</b></div>
-  <div class="resource">STONE <b id="stone">0</b></div>
-  <div class="resource">FOOD <b id="food">0</b></div>
- </div>
- <div id="controls">
-  <b>W A S D</b> — Move<br>
-  <b>SHIFT</b> — Sprint<br>
-  <b>SPACE</b> — Jump<br>
-  <b>MOUSE</b> — Look around<br>
-  <b>E</b> — Interact / enter vehicle<br>
-  <b>F</b> — Gather resources<br>
-  <b>B</b> — Building menu<br>
-  <b>1 / 2 / 3</b> — Select structure<br>
-  <b>CLICK</b> — Place structure<br>
-  <b>ESC</b> — Release mouse
- </div>
- <div id="crosshair"></div>
+
  <div id="message"></div>
- <div id="buildpanel">
-  <h3>CONSTRUCTION</h3>
-  <button class="buildbutton active" data-build="platform">1 — Wooden platform</button>
-  <button class="buildbutton" data-build="wall">2 — Wooden wall</button>
-  <button class="buildbutton" data-build="ladder">3 — Ladder</button>
-  <p style="font-size:10px;color:#aeb9ad;line-height:1.5">Move the preview with your view. Click to place. Press B to close.</p>
- </div>
- <div id="damage"></div>
-</div>
-<div id="help">Click the world to capture your mouse • Press ESC to release it</div>
+ <div id="crosshair"></div>
 
-<script type="importmap">
-{
- "imports": {
-  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"
- }
-}
-</script>
+ <div id="buildPanel" class="panel">
+  <div class="eyebrow">CONSTRUCTION</div>
+  <div style="font-size:12px;margin-bottom:8px">Select a structure</div>
+  <button data-build="platform" class="active">01 · Raised platform — 8 wood</button>
+  <button data-build="wall">02 · Timber wall — 4 wood</button>
+  <button data-build="ramp">03 · Access ramp — 5 wood</button>
+  <button data-build="ladder">04 · Climbing ladder — 6 wood</button>
+  <button id="buildCancel">CANCEL BUILD</button>
+  <p style="font-size:9px;color:#a8ad9f;line-height:1.5">
+   Arrow keys move the preview. ENTER places it. ESC cancels.
+  </p>
+ </div>
+
+ <div id="vehicleHud"><strong id="speed">0</strong><span>KM/H · 4×4</span></div>
+
+ <div id="bottom">
+  <div class="key"><b>↑ ↓</b> MOVE</div>
+  <div class="key"><b>← →</b> TURN</div>
+  <div class="key"><b>SPACE</b> JUMP</div>
+  <div class="key"><b>E</b> INTERACT</div>
+  <div class="key"><b>B</b> BUILD</div>
+ </div>
+ <div id="toast"></div>
+</div>
 
 <script type="module">
-import * as THREE from 'three';
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js";
 
-const $ = id => document.getElementById(id);
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x9aaea7);
-scene.fog = new THREE.FogExp2(0x9aaea7, 0.0105);
+const $=id=>document.getElementById(id);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const lerp=(a,b,t)=>a+(b-a)*t;
+const rand=(a,b)=>a+Math.random()*(b-a);
 
-const camera = new THREE.PerspectiveCamera(65, innerWidth/innerHeight, 0.1, 700);
-const renderer = new THREE.WebGLRenderer({antialias:true, powerPreference:'high-performance'});
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x9ba99b);
+scene.fog=new THREE.FogExp2(0x9ba99b,.0105);
+
+const camera=new THREE.PerspectiveCamera(62,innerWidth/innerHeight,.1,650);
+
+const renderer=new THREE.WebGLRenderer({
+ antialias:true,
+ powerPreference:"high-performance"
+});
 renderer.setSize(innerWidth,innerHeight);
-renderer.setPixelRatio(Math.min(devicePixelRatio,1.8));
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.1;
-$('game').appendChild(renderer.domElement);
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.08;
+document.body.appendChild(renderer.domElement);
 
-const clock = new THREE.Clock();
-const world = new THREE.Group();
-scene.add(world);
+scene.add(new THREE.HemisphereLight(0xdce8df,0x35402e,2));
 
-const hemi = new THREE.HemisphereLight(0xc6d9df,0x43513a,2.0);
-scene.add(hemi);
-const sun = new THREE.DirectionalLight(0xffe4bd,3.0);
-sun.position.set(-65,100,-35);
-sun.castShadow = true;
+const sun=new THREE.DirectionalLight(0xffe3b5,2.25);
+sun.position.set(-90,130,55);
+sun.castShadow=true;
 sun.shadow.mapSize.set(2048,2048);
-sun.shadow.camera.left=-100; sun.shadow.camera.right=100;
-sun.shadow.camera.top=100; sun.shadow.camera.bottom=-100;
-sun.shadow.bias=-0.0002;
+sun.shadow.camera.left=-95;
+sun.shadow.camera.right=95;
+sun.shadow.camera.top=95;
+sun.shadow.camera.bottom=-95;
+sun.shadow.camera.near=1;
+sun.shadow.camera.far=300;
+sun.shadow.bias=-.00025;
 scene.add(sun);
 
-let environment='temperate';
-let difficulty='normal';
-let playing=false;
-let buildMode=false;
-let selectedBuild='platform';
-let inVehicle=false;
-let gameTime=8*60;
-let day=1;
-let resources={wood:0,stone:0,food:0};
-let messageTimer=0;
-let objectiveStep=0;
+const mat=(color,rough=.9,metal=0)=>new THREE.MeshStandardMaterial({
+ color,roughness:rough,metalness:metal
+});
 
-const keys={};
-let yaw=0, pitch=-0.18;
-let mouseLocked=false;
-let cameraDistance=7;
-let playerVelocity=new THREE.Vector3();
-let verticalVelocity=0;
-let onGround=true;
-let vehicleSpeed=0;
-let steering=0;
-
-const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-const rand=(a,b)=>a+Math.random()*(b-a);
-const smooth=(a,b,x)=>{let t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t);};
-const mat=(color,roughness=1,metalness=0)=>new THREE.MeshStandardMaterial({color,roughness,metalness});
-const barkMat=mat(0x49392a);
-const leafMats=[mat(0x263e2b),mat(0x304b30),mat(0x3b5734),mat(0x536744)];
-const rockMat=mat(0x62665e);
-const woodMat=mat(0x79583a);
-const darkWood=mat(0x4c3927);
-const metalMat=mat(0x323a39,.42,.65);
+const materials={
+ ground:mat(0x526044),
+ bark:mat(0x59432e),
+ leaf1:mat(0x29452d),
+ rock:mat(0x77766b),
+ wood:mat(0x80603c),
+ metal:mat(0x3c4645,.45,.65),
+ glass:mat(0x344b4a,.2,.3),
+ tyre:mat(0x171a19),
+ skin:mat(0xc18e68),
+ shirt:mat(0x596b50),
+ pants:mat(0x303b39),
+ boot:mat(0x25221d)
+};
 
 function terrainHeight(x,z){
- return Math.sin(x*.025)*3.2 + Math.cos(z*.021)*3.0 +
- Math.sin((x+z)*.018)*2.0 + Math.cos((x-z)*.035)*1.2 +
- Math.sin(x*.075+z*.03)*.35;
+ const broad=Math.sin(x*.023)*2.8+Math.cos(z*.021)*3.3;
+ const rolling=Math.sin((x+z)*.047)*1.15+
+                Math.cos((x-z)*.039)*.85;
+ const ridge=Math.sin(x*.008+Math.cos(z*.01))*5.5;
+ const hollow=-Math.exp(-((x-20)**2+(z+12)**2)/800)*3;
+ return broad+rolling+ridge+hollow;
 }
 
-function makeGround(){
- const size=360, segments=190;
- const geo=new THREE.PlaneGeometry(size,size,segments,segments);
- geo.rotateX(-Math.PI/2);
- const pos=geo.attributes.position;
- const colors=[];
- const c1=new THREE.Color(0x344b32), c2=new THREE.Color(0x65704a), c3=new THREE.Color(0x454b3b);
- for(let i=0;i<pos.count;i++){
-  const x=pos.getX(i), z=pos.getZ(i);
-  const y=terrainHeight(x,z);
-  pos.setY(i,y);
-  const variation=(Math.sin(x*.17)*Math.cos(z*.13)+Math.sin(z*.31+x*.2))*.08;
-  const color=c1.clone().lerp(c2,smooth(-2,8,y)*.48+variation);
-  if(Math.abs(y)>5) color.lerp(c3,.28);
-  colors.push(color.r,color.g,color.b);
+// TERRAIN
+const groundGeo=new THREE.PlaneGeometry(440,440,180,180);
+groundGeo.rotateX(-Math.PI/2);
+const positions=groundGeo.attributes.position;
+
+for(let i=0;i<positions.count;i++){
+ const x=positions.getX(i);
+ const z=positions.getZ(i);
+ positions.setY(i,terrainHeight(x,z));
+}
+groundGeo.computeVertexNormals();
+
+const ground=new THREE.Mesh(groundGeo,materials.ground);
+ground.receiveShadow=true;
+scene.add(ground);
+
+// FOREST PATH
+function makeTrail(){
+ const vertices=[],uv=[],indices=[];
+ const steps=260;
+
+ for(let i=0;i<=steps;i++){
+  const t=i/steps;
+  const z=150-t*300;
+  const x=Math.sin(t*7.2)*17+Math.sin(t*19)*3;
+  const width=3.8+Math.sin(t*17)*.45;
+
+  for(const side of [-1,1]){
+   const px=x+side*width/2;
+   vertices.push(px,terrainHeight(px,z)+.045,z);
+   uv.push(side===-1?0:1,t*18);
+  }
+
+  if(i<steps){
+   const a=i*2;
+   indices.push(a,a+1,a+2,a+1,a+3,a+2);
+  }
  }
- geo.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));
- geo.computeVertexNormals();
- const groundMat=new THREE.MeshStandardMaterial({vertexColors:true,roughness:1});
- const ground=new THREE.Mesh(geo,groundMat);
- ground.receiveShadow=true;
- world.add(ground);
-}
-makeGround();
 
-function addTree(x,z,scale=1){
+ const g=new THREE.BufferGeometry();
+ g.setAttribute("position",new THREE.Float32BufferAttribute(vertices,3));
+ g.setAttribute("uv",new THREE.Float32BufferAttribute(uv,2));
+ g.setIndex(indices);
+ g.computeVertexNormals();
+
+ const trail=new THREE.Mesh(g,mat(0x75694f));
+ trail.position.y=.01;
+ scene.add(trail);
+}
+makeTrail();
+
+// INSTANCED FOREST
+const trunkGeo=new THREE.CylinderGeometry(.24,.38,1,7);
+const canopyGeo=new THREE.ConeGeometry(1,1,7);
+const trunkCount=760;
+
+const trunks=new THREE.InstancedMesh(
+ trunkGeo,materials.bark,trunkCount
+);
+const canopies=new THREE.InstancedMesh(
+ canopyGeo,materials.leaf1,trunkCount
+);
+
+trunks.castShadow=true;
+trunks.receiveShadow=true;
+
+// Canopies do not cast shadows: this saves substantial rendering work.
+canopies.castShadow=false;
+canopies.receiveShadow=true;
+
+const dummy=new THREE.Object3D();
+const forest=[];
+
+let made=0;
+while(made<trunkCount){
+ const x=rand(-205,205);
+ const z=rand(-205,205);
+
+ if(Math.abs(x)<9&&Math.abs(z)<15)continue;
+
  const y=terrainHeight(x,z);
- const tree=new THREE.Group();
- tree.position.set(x,y,z);
- tree.scale.setScalar(scale);
- const height=rand(7,12);
- const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.22,.48,height,9),barkMat);
- trunk.position.y=height/2;
- trunk.castShadow=true; trunk.receiveShadow=true;
- tree.add(trunk);
+ const h=rand(6.5,12.5);
+ const r=rand(.72,1.45);
 
- // Roots
- for(let i=0;i<5;i++){
-  const a=i*Math.PI*2/5+rand(-.2,.2);
-  const root=new THREE.Mesh(new THREE.CylinderGeometry(.04,.19,1.5,5),barkMat);
-  root.position.set(Math.cos(a)*.52,.24,Math.sin(a)*.52);
-  root.rotation.z=Math.cos(a)*.55;
-  root.rotation.x=Math.sin(a)*.55;
-  root.castShadow=true;
-  tree.add(root);
- }
- // Branches
- for(let i=0;i<7;i++){
-  const yy=height*(.48+i*.065);
-  const a=i*2.4;
-  const branch=new THREE.Mesh(new THREE.CylinderGeometry(.035,.12,rand(1.3,2.5),6),barkMat);
-  branch.position.set(Math.cos(a)*.8,yy,Math.sin(a)*.8);
-  branch.rotation.z=Math.cos(a)*-.75;
-  branch.rotation.x=Math.sin(a)*.75;
-  branch.castShadow=true;
-  tree.add(branch);
- }
- // Layered foliage
- for(let i=0;i<5;i++){
-  const radius=rand(2.3,3.5)*(1-i*.1);
-  const crown=new THREE.Mesh(new THREE.IcosahedronGeometry(radius,2),leafMats[Math.floor(rand(0,leafMats.length))]);
-  crown.position.set(rand(-.7,.7),height*.57+i*.75,rand(-.7,.7));
-  crown.scale.set(rand(.85,1.2),rand(.85,1.3),rand(.85,1.2));
-  crown.castShadow=true;
-  tree.add(crown);
- }
- world.add(tree);
- return tree;
+ dummy.position.set(x,y+h/2,z);
+ dummy.scale.set(r,h,r);
+ dummy.rotation.y=rand(0,6.28);
+ dummy.updateMatrix();
+ trunks.setMatrixAt(made,dummy.matrix);
+
+ dummy.position.set(x,y+h*.83,z);
+ dummy.scale.set(h*.28,h*.48,h*.28);
+ dummy.rotation.set(rand(-.08,.08),rand(0,6.28),rand(-.08,.08));
+ dummy.updateMatrix();
+ canopies.setMatrixAt(made,dummy.matrix);
+
+ forest.push({x,z,r,h,harvested:false});
+ made++;
 }
 
-const trees=[];
-for(let i=0;i<550;i++){
- const x=rand(-165,165),z=rand(-165,165);
- if(Math.hypot(x,z)<13) continue;
- const tree=addTree(x,z,rand(.75,1.45));
- trees.push(tree);
-}
+trunks.instanceMatrix.needsUpdate=true;
+canopies.instanceMatrix.needsUpdate=true;
+scene.add(trunks,canopies);
 
-function addRock(x,z,scale=1){
- const rock=new THREE.Mesh(new THREE.DodecahedronGeometry(1,1),rockMat);
- rock.position.set(x,terrainHeight(x,z)+scale*.45,z);
- rock.scale.set(scale*rand(.8,1.4),scale*rand(.5,.9),scale*rand(.8,1.3));
- rock.rotation.set(rand(0,1),rand(0,3),rand(0,1));
- rock.castShadow=true; rock.receiveShadow=true;
- world.add(rock);
- return rock;
+// LOW VEGETATION
+const shrubGeo=new THREE.ConeGeometry(.42,1.15,5);
+const shrubs=new THREE.InstancedMesh(
+ shrubGeo,mat(0x41583a),1350
+);
+
+for(let i=0;i<1350;i++){
+ const x=rand(-210,210);
+ const z=rand(-210,210);
+ const y=terrainHeight(x,z);
+ const s=rand(.35,.95);
+
+ dummy.position.set(x,y+.42,z);
+ dummy.scale.set(s,s,s);
+ dummy.rotation.y=rand(0,6.28);
+ dummy.updateMatrix();
+ shrubs.setMatrixAt(i,dummy.matrix);
 }
-const rocks=[];
+shrubs.instanceMatrix.needsUpdate=true;
+scene.add(shrubs);
+
+// DECORATIVE ROCKS
+const rockGeo=new THREE.DodecahedronGeometry(1,0);
+const decorativeRocks=[];
+
 for(let i=0;i<145;i++){
- const x=rand(-155,155),z=rand(-155,155);
- if(Math.hypot(x,z)<12) continue;
- rocks.push(addRock(x,z,rand(.5,1.8)));
+ const x=rand(-190,190);
+ const z=rand(-190,190);
+
+ if(Math.abs(x)<12&&Math.abs(z)<18)continue;
+
+ const s=rand(.35,1.65);
+ const rock=new THREE.Mesh(rockGeo,materials.rock);
+ rock.position.set(x,terrainHeight(x,z)+s*.34,z);
+ rock.scale.set(s*1.25,s*.65,s);
+ rock.rotation.set(rand(-.2,.2),rand(0,6.28),rand(-.2,.2));
+ rock.castShadow=true;
+ rock.receiveShadow=true;
+ scene.add(rock);
+ decorativeRocks.push({x,z,r:s*.85});
 }
 
-// Fallen logs
-for(let i=0;i<45;i++){
- const x=rand(-150,150),z=rand(-150,150);
- const log=new THREE.Mesh(new THREE.CylinderGeometry(.22,.3,rand(3,7),9),barkMat);
- log.position.set(x,terrainHeight(x,z)+.3,z);
- log.rotation.z=Math.PI/2+rand(-.15,.15);
- log.rotation.y=rand(0,Math.PI);
- log.castShadow=true; world.add(log);
+// PEBBLES
+const pebbles=new THREE.InstancedMesh(
+ new THREE.IcosahedronGeometry(.16,0),
+ mat(0x777568),
+ 500
+);
+
+for(let i=0;i<500;i++){
+ const x=rand(-200,200);
+ const z=rand(-200,200);
+ const s=rand(.3,1.3);
+
+ dummy.position.set(x,terrainHeight(x,z)+.12,z);
+ dummy.scale.set(s,.45*s,s);
+ dummy.rotation.set(rand(0,1),rand(0,6),rand(0,1));
+ dummy.updateMatrix();
+ pebbles.setMatrixAt(i,dummy.matrix);
 }
+pebbles.instanceMatrix.needsUpdate=true;
+scene.add(pebbles);
 
-// Grass clusters
-const grassMat1=mat(0x53643a), grassMat2=mat(0x75804a);
-const grassGeo=new THREE.ConeGeometry(.09,.65,4);
-const grassGroup=new THREE.Group();
-for(let i=0;i<2600;i++){
- const x=rand(-170,170),z=rand(-170,170);
- if(Math.hypot(x,z)<10) continue;
- for(let j=0;j<3;j++){
-  const blade=new THREE.Mesh(grassGeo,Math.random()>.5?grassMat1:grassMat2);
-  blade.position.set(x+rand(-.35,.35),terrainHeight(x,z)+.25,z+rand(-.35,.35));
-  blade.rotation.z=rand(-.25,.25);
-  blade.rotation.y=rand(0,6.28);
-  grassGroup.add(blade);
- }
-}
-world.add(grassGroup);
+// FALLEN LOGS
+for(let i=0;i<28;i++){
+ const x=rand(-150,150);
+ const z=rand(-150,150);
+ const length=rand(2,6);
 
-// Character construction
-const player=new THREE.Group();
-scene.add(player);
-
-const skinMat=mat(0xc28e6c);
-const shirtMat=mat(0x3c5545);
-const trousersMat=mat(0x343c37);
-const bootMat=mat(0x29251f);
-const hairMat=mat(0x30251d);
-const headMat=mat(0xc99473);
-const jointMat=mat(0x4a5b49);
-
-function makeLimb(radiusTop,radiusBottom,length,material){
- const mesh=new THREE.Mesh(new THREE.CylinderGeometry(radiusTop,radiusBottom,length,10),material);
- mesh.castShadow=true;
- return mesh;
-}
-const body=new THREE.Mesh(new THREE.CapsuleGeometry(.38,.75,5,10),shirtMat);
-body.position.y=1.55; body.castShadow=true; player.add(body);
-const chest=new THREE.Mesh(new THREE.BoxGeometry(.7,.45,.38),shirtMat);
-chest.position.set(0,1.72,0); chest.castShadow=true; player.add(chest);
-
-const head=new THREE.Mesh(new THREE.SphereGeometry(.26,18,14),headMat);
-head.position.y=2.35; head.castShadow=true; player.add(head);
-const hair=new THREE.Mesh(new THREE.SphereGeometry(.27,16,10,0,Math.PI*2,0,Math.PI*.62),hairMat);
-hair.position.set(0,2.43,-.015); hair.castShadow=true; player.add(hair);
-
-const nose=new THREE.Mesh(new THREE.ConeGeometry(.055,.13,8),headMat);
-nose.position.set(0,2.32,.26); nose.rotation.x=Math.PI/2; player.add(nose);
-
-const armL=new THREE.Group(),armR=new THREE.Group();
-armL.position.set(-.43,1.87,0); armR.position.set(.43,1.87,0);
-const upperL=makeLimb(.13,.11,.48,shirtMat),upperR=makeLimb(.13,.11,.48,shirtMat);
-upperL.position.y=-.24; upperR.position.y=-.24;
-armL.add(upperL);armR.add(upperR);
-const lowerL=makeLimb(.09,.105,.43,skinMat),lowerR=makeLimb(.09,.105,.43,skinMat);
-lowerL.position.y=-.65;lowerR.position.y=-.65;
-armL.add(lowerL);armR.add(lowerR);
-player.add(armL,armR);
-
-const legL=new THREE.Group(),legR=new THREE.Group();
-legL.position.set(-.2,1.1,0); legR.position.set(.2,1.1,0);
-const thighL=makeLimb(.14,.18,.52,trousersMat),thighR=makeLimb(.14,.18,.52,trousersMat);
-thighL.position.y=-.25;thighR.position.y=-.25;
-legL.add(thighL);legR.add(thighR);
-const shinL=makeLimb(.10,.12,.48,trousersMat),shinR=makeLimb(.10,.12,.48,trousersMat);
-shinL.position.y=-.68;shinR.position.y=-.68;
-legL.add(shinL);legR.add(shinR);
-const footL=new THREE.Mesh(new THREE.BoxGeometry(.2,.13,.36),bootMat);
-const footR=footL.clone();
-footL.position.set(0,-.91,.09);footR.position.set(0,-.91,.09);
-legL.add(footL);legR.add(footR);
-player.add(legL,legR);
-
-// Backpack
-const pack=new THREE.Mesh(new THREE.BoxGeometry(.48,.65,.24),mat(0x574832));
-pack.position.set(0,1.65,-.31); pack.castShadow=true; player.add(pack);
-
-// Character animation
-let walkPhase=0;
-function animateCharacter(delta,moving,sprinting){
- if(moving){
-  walkPhase+=delta*(sprinting?12:7);
-  const swing=Math.sin(walkPhase);
-  legL.rotation.x=swing*.62;
-  legR.rotation.x=-swing*.62;
-  armL.rotation.x=-swing*.48;
-  armR.rotation.x=swing*.48;
-  body.position.y=1.55+Math.abs(Math.sin(walkPhase*2))*.035;
- } else {
-  legL.rotation.x=THREE.MathUtils.damp(legL.rotation.x,0,8,delta);
-  legR.rotation.x=THREE.MathUtils.damp(legR.rotation.x,0,8,delta);
-  armL.rotation.x=THREE.MathUtils.damp(armL.rotation.x,0,8,delta);
-  armR.rotation.x=THREE.MathUtils.damp(armR.rotation.x,0,8,delta);
- }
-}
-
-// Vehicle
-const vehicle=new THREE.Group();
-const vehicleBodyMat=mat(0x35483c,.55,.2);
-const glassMat=new THREE.MeshStandardMaterial({color:0x263b3e,metalness:.4,roughness:.2});
-const wheelGeo=new THREE.CylinderGeometry(.48,.48,.28,20);
-const wheels=[];
-const chassis=new THREE.Mesh(new THREE.BoxGeometry(2.3,.65,4.1),vehicleBodyMat);
-chassis.position.y=1.1; chassis.castShadow=true; vehicle.add(chassis);
-const bonnet=new THREE.Mesh(new THREE.BoxGeometry(2.2,.4,1.25),vehicleBodyMat);
-bonnet.position.set(0,1.55,1.25); bonnet.castShadow=true; vehicle.add(bonnet);
-const cabin=new THREE.Mesh(new THREE.BoxGeometry(1.9,1.0,1.9),vehicleBodyMat);
-cabin.position.set(0,2.0,-.45); cabin.castShadow=true; vehicle.add(cabin);
-const windshield=new THREE.Mesh(new THREE.BoxGeometry(1.72,.75,.035),glassMat);
-windshield.position.set(0,2.05,.53); vehicle.add(windshield);
-const rearGlass=new THREE.Mesh(new THREE.BoxGeometry(1.72,.7,.035),glassMat);
-rearGlass.position.set(0,2.05,-1.4); vehicle.add(rearGlass);
-for(const x of [-1,1]){
- for(const z of [-1.35,1.35]){
-  const wheel=new THREE.Mesh(wheelGeo,mat(0x171a18));
-  wheel.rotation.z=Math.PI/2;
-  wheel.position.set(x*1.15,.62,z);
-  wheel.castShadow=true;vehicle.add(wheel);wheels.push(wheel);
- }
-}
-const bumper=new THREE.Mesh(new THREE.BoxGeometry(2.5,.22,.25),metalMat);
-bumper.position.set(0,.85,2.15);vehicle.add(bumper);
-const roofRack=new THREE.Mesh(new THREE.BoxGeometry(1.7,.08,1.55),metalMat);
-roofRack.position.set(0,2.55,-.45);vehicle.add(roofRack);
-vehicle.position.set(5,terrainHeight(5,5),5);
-world.add(vehicle);
-
-// Small interaction objects
-const pickups=[];
-function createPickup(type,x,z){
- const group=new THREE.Group();
- const y=terrainHeight(x,z);
- if(type==='wood'){
-  const obj=new THREE.Mesh(new THREE.CylinderGeometry(.12,.16,1.5,7),barkMat);
-  obj.rotation.z=Math.PI/2;obj.position.y=.18;group.add(obj);
- } else if(type==='stone'){
-  const obj=new THREE.Mesh(new THREE.DodecahedronGeometry(.35,1),rockMat);
-  obj.position.y=.25;group.add(obj);
- } else {
-  const stem=new THREE.Mesh(new THREE.CylinderGeometry(.035,.05,.4,6),mat(0x4a6133));
-  stem.position.y=.2;group.add(stem);
-  const cap=new THREE.Mesh(new THREE.SphereGeometry(.22,10,8),mat(0x9a6942));
-  cap.position.y=.42;cap.scale.y=.5;group.add(cap);
- }
- group.position.set(x,y,z);
- group.userData={type};
- world.add(group);pickups.push(group);
-}
-for(let i=0;i<30;i++){
- const x=rand(-80,80),z=rand(-80,80);
- if(Math.hypot(x,z)>15) createPickup('wood',x,z);
-}
-for(let i=0;i<35;i++){
- const x=rand(-80,80),z=rand(-80,80);
- if(Math.hypot(x,z)>15) createPickup('stone',x,z);
-}
-for(let i=0;i<20;i++){
- const x=rand(-70,70),z=rand(-70,70);
- if(Math.hypot(x,z)>15) createPickup('food',x,z);
-}
-
-// Construction system
-const placedStructures=[];
-const buildGroup=new THREE.Group();
-world.add(buildGroup);
-let preview=null;
-
-function makeStructure(type){
- const group=new THREE.Group();
- if(type==='platform'){
-  const base=new THREE.Mesh(new THREE.BoxGeometry(4,.25,4),woodMat);
-  base.position.y=2;group.add(base);
-  for(let x of [-1.7,1.7])for(let z of [-1.7,1.7]){
-   const post=new THREE.Mesh(new THREE.BoxGeometry(.22,2.2,.22),darkWood);
-   post.position.set(x,.9,z);group.add(post);
-  }
-  for(let i=0;i<9;i++){
-   const plank=new THREE.Mesh(new THREE.BoxGeometry(.42,.12,4),woodMat);
-   plank.position.set(-1.68+i*.42,2.18,0);group.add(plank);
-  }
- } else if(type==='wall'){
-  const frame=new THREE.Mesh(new THREE.BoxGeometry(4,2.5,.2),darkWood);
-  frame.position.y=1.25;group.add(frame);
-  for(let i=0;i<9;i++){
-   const plank=new THREE.Mesh(new THREE.BoxGeometry(.42,2.35,.12),woodMat);
-   plank.position.set(-1.68+i*.42,1.25,.13);group.add(plank);
-  }
-  for(let x of [-1.9,1.9]){
-   const post=new THREE.Mesh(new THREE.BoxGeometry(.2,2.7,.25),darkWood);
-   post.position.set(x,1.3,0);group.add(post);
-  }
- } else {
-  for(let i=0;i<2;i++){
-   const rail=new THREE.Mesh(new THREE.BoxGeometry(.14,3.8,.14),darkWood);
-   rail.position.set(i?-.55:.55,1.9,0);rail.rotation.z=i?-.13:.13;group.add(rail);
-  }
-  for(let i=0;i<10;i++){
-   const rung=new THREE.Mesh(new THREE.BoxGeometry(1.15,.12,.16),woodMat);
-   rung.position.set(0,.25+i*.38,0);group.add(rung);
-  }
- }
- group.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});
- return group;
-}
-
-function setBuildType(type){
- selectedBuild=type;
- document.querySelectorAll('.buildbutton').forEach(b=>b.classList.toggle('active',b.dataset.build===type));
- if(preview) buildGroup.remove(preview);
- preview=makeStructure(type);
- preview.traverse(o=>{if(o.isMesh)o.material=o.material.clone();});
- preview.traverse(o=>{if(o.isMesh){o.material.transparent=true;o.material.opacity=.45;}});
- buildGroup.add(preview);
-}
-
-function toggleBuild(){
- buildMode=!buildMode;
- $('buildpanel').style.display=buildMode?'block':'none';
- if(buildMode){
-  setBuildType(selectedBuild);
-  showMessage('Construction mode: choose a structure and position it');
- } else if(preview){
-  buildGroup.remove(preview);preview=null;
- }
-}
-
-function forwardVector(){
- return new THREE.Vector3(Math.sin(yaw),0,Math.cos(yaw)).normalize();
-}
-function getBuildPosition(){
- const dir=forwardVector();
- const p=player.position.clone().add(dir.multiplyScalar(5));
- p.y=terrainHeight(p.x,p.z);
- return p;
-}
-
-function placeStructure(){
- if(!buildMode||!preview)return;
- const cost={platform:8,wall:5,ladder:4}[selectedBuild];
- if(resources.wood<cost){
-  showMessage('Not enough wood. Gather more first.');
-  return;
- }
- resources.wood-=cost;
- updateResources();
- const placed=makeStructure(selectedBuild);
- placed.position.copy(preview.position);
- placed.rotation.copy(preview.rotation);
- world.add(placed);
- placedStructures.push(placed);
- showMessage(selectedBuild.toUpperCase()+' placed successfully');
-}
-
-// Message and resource HUD
-function showMessage(text){
- $('message').textContent=text;
- $('message').style.opacity=1;
- messageTimer=2.5;
-}
-function updateResources(){
- $('wood').textContent=resources.wood;
- $('stone').textContent=resources.stone;
- $('food').textContent=resources.food;
-}
-
-// Input
-window.addEventListener('keydown',e=>{
- keys[e.code]=true;
- if(e.code==='Space')e.preventDefault();
- if(!playing)return;
- if(e.code==='KeyB')toggleBuild();
- if(e.code==='Digit1')setBuildType('platform');
- if(e.code==='Digit2')setBuildType('wall');
- if(e.code==='Digit3')setBuildType('ladder');
- if(e.code==='KeyE')interact();
- if(e.code==='KeyF')gather();
-});
-window.addEventListener('keyup',e=>keys[e.code]=false);
-
-renderer.domElement.addEventListener('click',()=>{
- if(!playing)return;
- if(!mouseLocked)renderer.domElement.requestPointerLock();
- else if(buildMode)placeStructure();
-});
-document.addEventListener('pointerlockchange',()=>{
- mouseLocked=document.pointerLockElement===renderer.domElement;
-});
-document.addEventListener('mousemove',e=>{
- if(!mouseLocked)return;
- yaw-=e.movementX*.0023;
- pitch=clamp(pitch-e.movementY*.0018,-.8,.32);
-});
-document.querySelectorAll('.buildbutton').forEach(button=>{
- button.addEventListener('click',()=>setBuildType(button.dataset.build));
-});
-
-// Interactions
-function gather(){
- if(inVehicle){showMessage('Leave the vehicle before gathering.');return;}
- let nearest=null,dist=4;
- for(const item of pickups){
-  const d=item.position.distanceTo(player.position);
-  if(d<dist){dist=d;nearest=item;}
- }
- if(nearest){
-  const type=nearest.userData.type;
-  resources[type]++;
-  updateResources();
-  world.remove(nearest);
-  pickups.splice(pickups.indexOf(nearest),1);
-  showMessage(type==='wood'?'Wood collected':type==='stone'?'Stone collected':'Food collected');
-  updateObjective();
-  return;
- }
- // Gather wood from a nearby tree
- let tree=null,treeDist=5;
- for(const t of trees){
-  const d=t.position.distanceTo(player.position);
-  if(d<treeDist){tree=t;treeDist=d;}
- }
- if(tree){
-  resources.wood+=2;
-  updateResources();
-  showMessage('You gathered 2 wood');
-  updateObjective();
- } else {
-  showMessage('Nothing nearby to gather');
- }
-}
-
-function interact(){
- if(player.position.distanceTo(vehicle.position)<5){
-  inVehicle=!inVehicle;
-  if(inVehicle){
-   player.visible=false;
-   showMessage('Entered 4×4 — WASD to drive, E to exit');
-  } else {
-   player.visible=true;
-   player.position.copy(vehicle.position).add(new THREE.Vector3(2,0,0));
-   player.position.y=terrainHeight(player.position.x,player.position.z);
-   showMessage('Exited vehicle');
-  }
-  return;
- }
- showMessage('Nothing to interact with nearby');
-}
-
-function updateObjective(){
- if(resources.wood>=8 && objectiveStep===0){
-  objectiveStep=1;
-  $('objectiveText').textContent='You have enough wood to begin. Find a suitable location and use B to construct your first platform.';
-  showMessage('New objective: build your first platform');
- }
- if(placedStructures.length>0 && objectiveStep===1){
-  objectiveStep=2;
-  $('objectiveText').textContent='Your shelter is taking shape. Gather more materials and prepare for nightfall.';
- }
-}
-
-// Start game
-$('start').addEventListener('click',()=>{
- environment=$('environment').value;
- difficulty=$('difficulty').value;
- const equip=$('equipment').value;
- if(equip==='builder')resources.wood=12;
- if(equip==='explorer')resources.food=3;
- if(difficulty==='easy')resources.wood+=5;
- if(difficulty==='hard')gameTime=7*60;
- updateResources();
- $('screen').style.display='none';
- $('hud').style.display='block';
- $('help').style.display='block';
- playing=true;
- player.position.set(0,terrainHeight(0,0),0);
- yaw=0;
- showMessage('Welcome to Wildwood. Your survival starts now.');
-});
-
-// Update camera
-function updateCamera(delta){
- const target=inVehicle
- ? vehicle.position.clone().add(new THREE.Vector3(0,1.8,0))
- : player.position.clone().add(new THREE.Vector3(0,1.7,0));
- const distance=inVehicle?10:cameraDistance;
- const horizontal=Math.cos(pitch)*distance;
- const desired=new THREE.Vector3(
-  target.x-Math.sin(yaw)*horizontal,
-  target.y+Math.sin(-pitch)*distance+2,
-  target.z-Math.cos(yaw)*horizontal
+ const log=new THREE.Mesh(
+  new THREE.CylinderGeometry(.18,.25,length,7),
+  materials.bark
  );
- camera.position.lerp(desired,1-Math.exp(-5*delta));
- camera.lookAt(target);
+
+ log.rotation.z=Math.PI/2+rand(-.12,.12);
+ log.rotation.y=rand(0,6.28);
+ log.position.set(x,terrainHeight(x,z)+.28,z);
+ log.castShadow=true;
+ scene.add(log);
 }
 
-// Character movement
-function updatePlayer(delta){
- if(inVehicle)return;
- const forward=forwardVector();
- const right=new THREE.Vector3(forward.z,0,-forward.x);
- let move=new THREE.Vector3();
- if(keys.KeyW||keys.ArrowUp)move.add(forward);
- if(keys.KeyS||keys.ArrowDown)move.sub(forward);
- if(keys.KeyD||keys.ArrowRight)move.add(right);
- if(keys.KeyA||keys.ArrowLeft)move.sub(right);
- const moving=move.lengthSq()>0;
- const sprinting=keys.ShiftLeft||keys.ShiftRight;
- const speed=sprinting?9:5.2;
- if(moving){
-  move.normalize();
-  player.position.addScaledVector(move,speed*delta);
-  player.rotation.y=Math.atan2(move.x,move.z);
+// PLAYER
+function limb(length,radius,material){
+ const pivot=new THREE.Group();
+ const mesh=new THREE.Mesh(
+  new THREE.CylinderGeometry(radius*.78,radius,length,8),
+  material
+ );
+ mesh.position.y=-length/2;
+ mesh.castShadow=true;
+ pivot.add(mesh);
+ return pivot;
+}
+
+function makePerson(){
+ const root=new THREE.Group();
+
+ const torso=new THREE.Mesh(
+  new THREE.CapsuleGeometry(.34,.65,5,9),
+  materials.shirt
+ );
+ torso.position.y=1.25;
+ torso.castShadow=true;
+ root.add(torso);
+
+ const head=new THREE.Mesh(
+  new THREE.SphereGeometry(.235,14,12),
+  materials.skin
+ );
+ head.position.y=1.94;
+ head.castShadow=true;
+ root.add(head);
+
+ const hair=new THREE.Mesh(
+  new THREE.SphereGeometry(.245,12,8,0,Math.PI*2,0,Math.PI*.55),
+  mat(0x33291f)
+ );
+ hair.position.y=2.02;
+ root.add(hair);
+
+ const legs=[];
+ const arms=[];
+
+ for(const side of [-1,1]){
+  const leg=limb(.75,.115,materials.pants);
+  leg.position.set(side*.17,.91,0);
+  root.add(leg);
+  legs.push(leg);
+
+  const boot=new THREE.Mesh(
+   new THREE.BoxGeometry(.22,.16,.38),
+   materials.boot
+  );
+  boot.position.set(side*.17,.13,.09);
+  boot.castShadow=true;
+  root.add(boot);
+
+  const arm=limb(.65,.09,materials.shirt);
+  arm.position.set(side*.43,1.48,0);
+  arm.rotation.z=side*.12;
+  root.add(arm);
+  arms.push(arm);
  }
- if(keys.Space&&onGround){
-  verticalVelocity=7.5;
+
+ return {root,legs,arms,torso};
+}
+
+const player=makePerson();
+scene.add(player.root);
+player.root.position.set(0,terrainHeight(0,0),8);
+
+let playerYaw=0;
+let playerVel=0;
+let verticalVel=0;
+let onGround=true;
+let walkPhase=0;
+
+// VEHICLE
+function makeSUV(){
+ const root=new THREE.Group();
+ const bodyMat=mat(0x59634d,.55,.12);
+ const trim=mat(0x202724,.65,.2);
+
+ function box(w,h,d,m,x,y,z){
+  const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);
+  o.position.set(x,y,z);
+  o.castShadow=true;
+  o.receiveShadow=true;
+  root.add(o);
+  return o;
+ }
+
+ box(2.15,.65,4.15,bodyMat,0,1.02,0);
+ box(2.05,.62,2.05,bodyMat,0,1.58,-.48);
+ box(1.87,.48,1.85,materials.glass,0,1.63,-.48);
+ box(2.22,.22,.18,trim,0,.8,2.08);
+ box(2.22,.2,.18,trim,0,.8,-2.08);
+ box(1.9,.18,.12,mat(0xd6d0ad,.35),0,1.08,2.1);
+ box(1.9,.15,.12,mat(0x8a2922),0,1.02,-2.1);
+ box(1.65,.08,1.45,trim,0,2.02,-.48);
+ box(1.05,.36,.08,trim,0,1.08,2.15);
+
+ const wheels=[];
+
+ for(const x of [-1.13,1.13]){
+  for(const z of [-1.35,1.35]){
+   const pivot=new THREE.Group();
+   pivot.position.set(x,.57,z);
+   root.add(pivot);
+
+   const tyre=new THREE.Mesh(
+    new THREE.CylinderGeometry(.47,.47,.28,18),
+    materials.tyre
+   );
+   tyre.rotation.z=Math.PI/2;
+   tyre.castShadow=true;
+   pivot.add(tyre);
+
+   const hub=new THREE.Mesh(
+    new THREE.CylinderGeometry(.22,.22,.29,12),
+    materials.metal
+   );
+   hub.rotation.z=Math.PI/2;
+   pivot.add(hub);
+
+   wheels.push({pivot,tyre,front:z>0});
+  }
+ }
+
+ return {root,wheels};
+}
+
+const suv=makeSUV();
+scene.add(suv.root);
+suv.root.position.set(4,terrainHeight(4,-4),-4);
+
+let carYaw=0;
+let carSpeed=0;
+let carSteer=0;
+let mode="player";
+
+// RESOURCES
+let wood=0;
+let stone=0;
+let dayMinutes=480;
+
+const resourceRocks=[];
+
+function updateResources(){
+ $("wood").textContent=wood;
+ $("stone").textContent=stone;
+}
+
+function toast(text){
+ $("toast").textContent=text;
+ $("toast").style.opacity=1;
+ clearTimeout(toast.timer);
+ toast.timer=setTimeout(()=>$("toast").style.opacity=0,1900);
+}
+
+function say(text){
+ $("message").textContent=text;
+ $("message").style.opacity=1;
+ clearTimeout(say.timer);
+ say.timer=setTimeout(()=>$("message").style.opacity=0,1700);
+}
+
+function updateObjective(title,desc){
+ $("objectiveTitle").textContent=title;
+ $("objectiveText").textContent=desc;
+}
+
+// RESOURCE ROCKS: these are separate from scenery rocks.
+for(let i=0;i<10;i++){
+ const x=rand(-22,22);
+ const z=rand(-28,28);
+
+ const mesh=new THREE.Mesh(
+  new THREE.DodecahedronGeometry(.45,0),
+  materials.rock
+ );
+ mesh.position.set(x,terrainHeight(x,z)+.3,z);
+ mesh.scale.set(1,.7,1);
+ mesh.castShadow=true;
+ scene.add(mesh);
+
+ resourceRocks.push({x,z,mesh,collected:false});
+}
+
+// TREE RESOURCE SYSTEM
+function rebuildForest(){
+ let index=0;
+
+ for(const t of forest){
+  if(t.harvested)continue;
+
+  dummy.position.set(
+   t.x,
+   terrainHeight(t.x,t.z)+t.h/2,
+   t.z
+  );
+  dummy.scale.set(t.r,t.h,t.r);
+  dummy.rotation.set(0,0,0);
+  dummy.updateMatrix();
+  trunks.setMatrixAt(index,dummy.matrix);
+
+  dummy.position.set(
+   t.x,
+   terrainHeight(t.x,t.z)+t.h*.83,
+   t.z
+  );
+  dummy.scale.set(t.h*.28,t.h*.48,t.h*.28);
+  dummy.rotation.set(0,0,0);
+  dummy.updateMatrix();
+  canopies.setMatrixAt(index,dummy.matrix);
+  index++;
+ }
+
+ for(let i=index;i<trunkCount;i++){
+  dummy.position.set(0,-1000,0);
+  dummy.scale.setScalar(0);
+  dummy.updateMatrix();
+  trunks.setMatrixAt(i,dummy.matrix);
+  canopies.setMatrixAt(i,dummy.matrix);
+ }
+
+ trunks.instanceMatrix.needsUpdate=true;
+ canopies.instanceMatrix.needsUpdate=true;
+}
+
+function nearestTree(){
+ let best=null;
+ let distance=999;
+
+ for(const t of forest){
+  if(t.harvested)continue;
+
+  const d=Math.hypot(
+   t.x-player.root.position.x,
+   t.z-player.root.position.z
+  );
+
+  if(d<distance){
+   distance=d;
+   best=t;
+  }
+ }
+
+ return distance<3.2?best:null;
+}
+
+function nearestRock(){
+ let best=null;
+ let distance=999;
+
+ for(const r of resourceRocks){
+  if(r.collected)continue;
+
+  const d=Math.hypot(
+   r.x-player.root.position.x,
+   r.z-player.root.position.z
+  );
+
+  if(d<distance){
+   distance=d;
+   best=r;
+  }
+ }
+
+ return distance<2.7?best:null;
+}
+
+// BUILDING SYSTEM
+const buildCost={
+ platform:8,
+ wall:4,
+ ramp:5,
+ ladder:6
+};
+
+let buildType="platform";
+let buildGhost=null;
+let built=[];
+let buildOffsetX=0;
+let buildOffsetZ=0;
+
+function makeStructure(type,ghost=false){
+ const g=new THREE.Group();
+
+ const woodMat=ghost
+  ?new THREE.MeshStandardMaterial({
+    color:0x9fd7a0,
+    transparent:true,
+    opacity:.48,
+    roughness:.8
+   })
+  :materials.wood;
+
+ function piece(w,h,d,x,y,z){
+  const m=new THREE.Mesh(
+   new THREE.BoxGeometry(w,h,d),
+   woodMat
+  );
+  m.position.set(x,y,z);
+  m.castShadow=!ghost;
+  m.receiveShadow=true;
+  g.add(m);
+ }
+
+ if(type==="platform"){
+  piece(4,.22,4,0,1.7,0);
+
+  for(const x of [-1.7,1.7]){
+   for(const z of [-1.7,1.7]){
+    piece(.18,1.8,.18,x,.85,z);
+   }
+  }
+
+  for(let i=-1;i<=1;i++){
+   piece(4,.12,.16,0,1.55,i*1.25);
+  }
+ }
+
+ if(type==="wall"){
+  for(let i=0;i<5;i++){
+   piece(3.8,.28,.18,0,i*.31,0);
+  }
+  piece(.16,1.5,.22,-1.95,.7,0);
+  piece(.16,1.5,.22,1.95,.7,0);
+ }
+
+ if(type==="ramp"){
+  const ramp=new THREE.Mesh(
+   new THREE.BoxGeometry(2.5,.18,4),
+   woodMat
+  );
+  ramp.rotation.x=-.35;
+  ramp.position.y=.7;
+  ramp.castShadow=!ghost;
+  g.add(ramp);
+
+  for(let i=0;i<7;i++){
+   piece(2.5,.12,.12,0,.22+i*.15,-1.6+i*.48);
+  }
+ }
+
+ if(type==="ladder"){
+  piece(.16,3,.16,-.72,1.5,0);
+  piece(.16,3,.16,.72,1.5,0);
+
+  for(let i=0;i<9;i++){
+   piece(1.45,.1,.14,0,.15+i*.33,0);
+  }
+ }
+
+ return g;
+}
+
+function updateGhost(){
+ if(!buildGhost)return;
+
+ const p=player.root.position;
+ const forward=new THREE.Vector3(
+  Math.sin(playerYaw),0,Math.cos(playerYaw)
+ );
+ const right=new THREE.Vector3(
+  Math.cos(playerYaw),0,-Math.sin(playerYaw)
+ );
+
+ const x=Math.round(
+  (p.x+forward.x*4+right.x*buildOffsetX+forward.x*buildOffsetZ)
+ );
+ const z=Math.round(
+  (p.z+forward.z*4+right.z*buildOffsetX+forward.z*buildOffsetZ)
+ );
+
+ buildGhost.position.set(x,terrainHeight(x,z),z);
+ buildGhost.rotation.y=playerYaw;
+
+ const collision=built.some(o=>
+  o.position.distanceTo(buildGhost.position)<3
+ );
+
+ buildGhost.userData.invalid=collision;
+
+ buildGhost.traverse(o=>{
+  if(o.material&&o.material.color){
+   o.material.color.set(collision?0xe36d61:0x9fd7a0);
+  }
+ });
+}
+
+function startBuild(){
+ if(mode==="car")return toast("Leave the vehicle before building");
+
+ $("buildPanel").style.display="block";
+
+ if(buildGhost)scene.remove(buildGhost);
+
+ buildOffsetX=0;
+ buildOffsetZ=0;
+ buildGhost=makeStructure(buildType,true);
+ scene.add(buildGhost);
+ updateGhost();
+}
+
+function cancelBuild(){
+ if(buildGhost)scene.remove(buildGhost);
+ buildGhost=null;
+ $("buildPanel").style.display="none";
+}
+
+function placeBuild(){
+ if(!buildGhost)return;
+
+ const cost=buildCost[buildType];
+
+ if(wood<cost){
+  toast("NOT ENOUGH WOOD");
+  return;
+ }
+
+ if(buildGhost.userData.invalid){
+  toast("THAT LOCATION IS BLOCKED");
+  return;
+ }
+
+ const obj=makeStructure(buildType,false);
+ obj.position.copy(buildGhost.position);
+ obj.rotation.copy(buildGhost.rotation);
+
+ scene.add(obj);
+ built.push(obj);
+ wood-=cost;
+ updateResources();
+
+ toast(buildType.toUpperCase()+" CONSTRUCTED");
+}
+
+document.querySelectorAll("[data-build]").forEach(btn=>{
+ btn.addEventListener("click",()=>{
+  document.querySelectorAll("[data-build]").forEach(b=>
+   b.classList.remove("active")
+  );
+
+  btn.classList.add("active");
+  buildType=btn.dataset.build;
+  startBuild();
+ });
+});
+
+$("buildCancel").onclick=cancelBuild;
+
+// COLLISION
+function blockedAt(x,z,radius){
+ for(const t of forest){
+  if(t.harvested)continue;
+
+  if(Math.hypot(x-t.x,z-t.z)<t.r*.48+radius){
+   return true;
+  }
+ }
+
+ for(const r of decorativeRocks){
+  if(Math.hypot(x-r.x,z-r.z)<r.r+radius){
+   return true;
+  }
+ }
+
+ return false;
+}
+
+// INTERACTION
+function enterExit(){
+ if(mode==="player"){
+  const distance=suv.root.position.distanceTo(player.root.position);
+
+  if(distance<5){
+   mode="car";
+   player.root.visible=false;
+   $("vehicleHud").style.display="block";
+   toast("4×4 ENTERED · ARROW KEYS TO DRIVE");
+   return;
+  }
+
+  const tree=nearestTree();
+  const rock=nearestRock();
+
+  if(tree){
+   tree.harvested=true;
+   wood+=3;
+   updateResources();
+   rebuildForest();
+   say("WOOD COLLECTED");
+   return;
+  }
+
+  if(rock){
+   rock.collected=true;
+   rock.mesh.visible=false;
+   stone+=2;
+   updateResources();
+   say("STONE COLLECTED");
+   return;
+  }
+
+  toast("NOTHING CLOSE ENOUGH TO INTERACT WITH");
+ }else{
+  mode="player";
+  player.root.visible=true;
+
+  const px=suv.root.position.x+Math.sin(carYaw)*3;
+  const pz=suv.root.position.z+Math.cos(carYaw)*3;
+
+  player.root.position.set(px,terrainHeight(px,pz),pz);
+  $("vehicleHud").style.display="none";
+  carSpeed=0;
+ }
+}
+
+// INPUT
+const keys={};
+
+window.addEventListener("keydown",e=>{
+ if([
+  "ArrowUp","ArrowDown","ArrowLeft","ArrowRight","Space"
+ ].includes(e.code)){
+  e.preventDefault();
+ }
+
+ keys[e.code]=true;
+
+ if(e.repeat)return;
+
+ if(e.code==="KeyE")enterExit();
+
+ if(e.code==="KeyB"){
+  if(buildGhost)cancelBuild();
+  else startBuild();
+ }
+
+ if(e.code==="Enter"&&buildGhost)placeBuild();
+ if(e.code==="Escape"&&buildGhost)cancelBuild();
+
+ if(e.code==="Space"&&mode==="player"&&!buildGhost&&onGround){
+  verticalVel=7.2;
   onGround=false;
  }
- verticalVelocity-=19*delta;
- player.position.y+=verticalVelocity*delta;
- const ground=terrainHeight(player.position.x,player.position.z);
- if(player.position.y<=ground){
-  player.position.y=ground;
-  verticalVelocity=0;
-  onGround=true;
- }
- // World boundary
- player.position.x=clamp(player.position.x,-175,175);
- player.position.z=clamp(player.position.z,-175,175);
- animateCharacter(delta,moving,sprinting);
-}
+});
 
-// Vehicle movement
-function updateVehicle(delta){
- if(!inVehicle){
-  vehicleSpeed=THREE.MathUtils.damp(vehicleSpeed,0,1.5,delta);
+window.addEventListener("keyup",e=>{
+ keys[e.code]=false;
+});
+
+window.addEventListener("blur",()=>{
+ Object.keys(keys).forEach(k=>keys[k]=false);
+});
+
+// CAMERA ORBIT
+let dragging=false;
+let lastX=0,lastY=0;
+let cameraYaw=0,cameraPitch=.28;
+
+renderer.domElement.addEventListener("pointerdown",e=>{
+ dragging=true;
+ lastX=e.clientX;
+ lastY=e.clientY;
+ renderer.domElement.setPointerCapture(e.pointerId);
+});
+
+renderer.domElement.addEventListener("pointerup",()=>{
+ dragging=false;
+});
+
+renderer.domElement.addEventListener("pointermove",e=>{
+ if(!dragging)return;
+
+ cameraYaw-=(e.clientX-lastX)*.004;
+ cameraPitch=clamp(
+  cameraPitch+(e.clientY-lastY)*.003,
+  -.05,.9
+ );
+
+ lastX=e.clientX;
+ lastY=e.clientY;
+});
+
+// PLAYER PHYSICS
+let walkPhase=0;
+
+function updatePlayer(dt){
+ if(buildGhost){
+  const speed=5*dt;
+
+  if(keys.ArrowLeft)buildOffsetX-=speed;
+  if(keys.ArrowRight)buildOffsetX+=speed;
+  if(keys.ArrowUp)buildOffsetZ+=speed;
+  if(keys.ArrowDown)buildOffsetZ-=speed;
+
+  updateGhost();
   return;
  }
- const acceleration=keys.KeyW?13:keys.KeyS?-10:0;
- vehicleSpeed+=acceleration*delta;
- vehicleSpeed*=Math.pow(.985,delta*60);
- vehicleSpeed=clamp(vehicleSpeed,-12,24);
- const steeringInput=(keys.KeyA?1:0)-(keys.KeyD?1:0);
- steering=THREE.MathUtils.damp(steering,steeringInput,.12,delta);
- vehicle.rotation.y+=steering*vehicleSpeed*.025*delta;
- const direction=new THREE.Vector3(Math.sin(vehicle.rotation.y),0,Math.cos(vehicle.rotation.y));
- vehicle.position.addScaledVector(direction,vehicleSpeed*delta);
- vehicle.position.x=clamp(vehicle.position.x,-175,175);
- vehicle.position.z=clamp(vehicle.position.z,-175,175);
- vehicle.position.y=terrainHeight(vehicle.position.x,vehicle.position.z);
- for(const wheel of wheels)wheel.rotation.x-=vehicleSpeed*delta*1.7;
-}
 
-// Day/night lighting
-function updateDayNight(delta){
- gameTime+=delta*1.25;
- if(gameTime>=24*60){
-  gameTime=0;day++;
-  $('day').textContent='DAY '+String(day).padStart(2,'0');
+ const forward=(keys.ArrowUp?1:0)-(keys.ArrowDown?1:0);
+
+ // CORRECT TURN DIRECTIONS:
+ // Left produces negative yaw. Right produces positive yaw.
+ const turn=(keys.ArrowRight?1:0)-(keys.ArrowLeft?1:0);
+
+ if(Math.abs(forward)>.01){
+  playerYaw+=turn*dt*2.05*(playerVel<0?-1:1);
+
+  const target=forward*5.3;
+  playerVel=lerp(
+   playerVel,
+   target,
+   1-Math.exp(-dt*4.5)
+  );
+ }else{
+  playerYaw+=turn*dt*1.65;
+  playerVel=lerp(
+   playerVel,
+   0,
+   1-Math.exp(-dt*5.5)
+  );
  }
- const hours=Math.floor(gameTime/60);
- const minutes=Math.floor(gameTime%60);
- $('clock').textContent=String(hours).padStart(2,'0')+':'+String(minutes).padStart(2,'0');
- const daylight=smooth(5,8,hours+minutes/60)*(1-smooth(17,20,hours+minutes/60));
- sun.intensity=.18+daylight*2.8;
- hemi.intensity=.35+daylight*1.7;
- scene.background.setHSL(.52,.12,.12+daylight*.43);
- scene.fog.color.setHSL(.28,.12,.12+daylight*.35);
- if(hours>=19||hours<6){
-  $('condition').textContent='NIGHT APPROACHING';
-  $('objectiveText').textContent='Darkness is approaching. Gather supplies and make sure you have a shelter.';
- } else $('condition').textContent='STABLE';
-}
 
-// Build preview update
-function updateBuildPreview(){
- if(!buildMode||!preview)return;
- const p=getBuildPosition();
- preview.position.copy(p);
- preview.position.y=terrainHeight(p.x,p.z);
- preview.rotation.y=yaw;
-}
+ const dx=Math.sin(playerYaw)*playerVel*dt;
+ const dz=Math.cos(playerYaw)*playerVel*dt;
+ const p=player.root.position;
 
-// Main loop
-function animate(){
- requestAnimationFrame(animate);
- const delta=Math.min(clock.getDelta(),.04);
- if(playing){
-  updateDayNight(delta);
-  updatePlayer(delta);
-  updateVehicle(delta);
-  updateCamera(delta);
-  updateBuildPreview();
-  if(messageTimer>0){
-   messageTimer-=delta;
-   if(messageTimer<=0)$('message').style.opacity=0;
+ if(!blockedAt(p.x+dx,p.z,.42))p.x+=dx;
+ if(!blockedAt(p.x,p.z+dz,.42))p.z+=dz;
+
+ p.x=clamp(p.x,-214,214);
+ p.z=clamp(p.z,-214,214);
+
+ const floor=terrainHeight(p.x,p.z);
+
+ if(!onGround){
+  verticalVel-=19*dt;
+  p.y+=verticalVel*dt;
+
+  if(p.y<=floor){
+   p.y=floor;
+   verticalVel=0;
+   onGround=true;
   }
- } else {
-  const t=clock.elapsedTime;
-  camera.position.set(Math.sin(t*.04)*28,18,30+Math.cos(t*.04)*28);
-  camera.lookAt(0,2,0);
+ }else{
+  p.y=floor;
  }
+
+ player.root.rotation.y=playerYaw;
+
+ const moving=Math.abs(playerVel)>.25;
+ walkPhase+=dt*(moving?Math.abs(playerVel)*2.1:0);
+
+ const swing=moving?Math.sin(walkPhase)*.58:0;
+
+ player.legs[0].rotation.x=swing;
+ player.legs[1].rotation.x=-swing;
+ player.arms[0].rotation.x=-swing*.72;
+ player.arms[1].rotation.x=swing*.72;
+ player.torso.rotation.z=moving?Math.sin(walkPhase*2)*.025:0;
+}
+
+// VEHICLE PHYSICS
+function updateCar(dt){
+ const throttle=(keys.ArrowUp?1:0)-(keys.ArrowDown?1:0);
+
+ // Correct steering: left = negative yaw, right = positive yaw.
+ const steer=(keys.ArrowRight?1:0)-(keys.ArrowLeft?1:0);
+
+ const speedAbs=Math.abs(carSpeed);
+ const maxSpeed=18;
+
+ const acceleration=throttle===0
+  ?0
+  :throttle*(carSpeed*throttle<0?24:10);
+
+ carSpeed+=acceleration*dt;
+
+ if(throttle===0){
+  carSpeed*=Math.exp(-.72*dt);
+ }
+
+ carSpeed=clamp(carSpeed,-8,maxSpeed);
+
+ const steerAuthority=clamp(speedAbs/4,.18,1);
+
+ carSteer=lerp(
+  carSteer,
+  steer*.48,
+  1-Math.exp(-dt*5)
+ );
+
+ carYaw+=carSteer*steerAuthority*dt*
+  (carSpeed>=0?1:-1)*1.45;
+
+ const dx=Math.sin(carYaw)*carSpeed*dt;
+ const dz=Math.cos(carYaw)*carSpeed*dt;
+ const p=suv.root.position;
+
+ if(!blockedAt(p.x+dx,p.z,1.25)){
+  p.x+=dx;
+ }else{
+  carSpeed*=.35;
+ }
+
+ if(!blockedAt(p.x,p.z+dz,1.25)){
+  p.z+=dz;
+ }else{
+  carSpeed*=.35;
+ }
+
+ p.x=clamp(p.x,-214,214);
+ p.z=clamp(p.z,-214,214);
+ p.y=terrainHeight(p.x,p.z);
+
+ suv.root.rotation.y=carYaw;
+
+ suv.wheels.forEach(w=>{
+  if(w.front)w.pivot.rotation.y=carSteer;
+  w.tyre.rotation.x-=carSpeed*dt*1.7;
+ });
+
+ $("speed").textContent=Math.round(Math.abs(carSpeed)*3.6);
+}
+
+// CAMERA
+const cameraTarget=new THREE.Vector3();
+const desiredCamera=new THREE.Vector3();
+
+function updateCamera(dt){
+ const target=mode==="car"
+  ?suv.root.position
+  :player.root.position;
+
+ const yaw=mode==="car"?carYaw:playerYaw;
+ const distance=mode==="car"?10.5:7.5;
+ const orbit=yaw+cameraYaw;
+ const focusY=mode==="car"?1.2:1.55;
+
+ cameraTarget.set(
+  target.x,
+  target.y+focusY,
+  target.z
+ );
+
+ desiredCamera.set(
+  target.x-Math.sin(orbit)*Math.cos(cameraPitch)*distance,
+  target.y+focusY+Math.sin(cameraPitch)*distance+1.2,
+  target.z-Math.cos(orbit)*Math.cos(cameraPitch)*distance
+ );
+
+ camera.position.lerp(
+  desiredCamera,
+  1-Math.exp(-dt*5.5)
+ );
+
+ camera.lookAt(cameraTarget);
+}
+
+// DAYLIGHT AND OBJECTIVES
+function updateEnvironment(dt){
+ dayMinutes+=dt*.42;
+
+ if(dayMinutes>=1440)dayMinutes=360;
+
+ const t=(dayMinutes-360)/720;
+ const daylight=clamp(Math.sin(t*Math.PI),.12,1);
+
+ sun.intensity=.45+daylight*1.9;
+
+ scene.fog.color.setRGB(
+  .055+(.61-.055)*daylight,
+  .09+(.68-.09)*daylight,
+  .075+(.59-.075)*daylight
+ );
+
+ scene.background.copy(scene.fog.color);
+
+ const h=Math.floor(dayMinutes/60)%24;
+ const m=Math.floor(dayMinutes%60);
+
+ $("clock").textContent=
+  String(h).padStart(2,"0")+":"+
+  String(m).padStart(2,"0");
+
+ if(dayMinutes>1080){
+  updateObjective(
+   "Darkness is approaching",
+   "Gather wood and stone. Build a raised shelter before night."
+  );
+ }else if(wood<8){
+  updateObjective(
+   "Gather building materials",
+   "Find trees and approach them. Press E to collect wood."
+  );
+ }else{
+  updateObjective(
+   "Build your shelter",
+   "Press B to choose a structure. Position it and press ENTER."
+  );
+ }
+}
+
+// MAIN LOOP
+const clock=new THREE.Clock();
+let accumulator=0;
+const fixed=1/60;
+
+function frame(){
+ requestAnimationFrame(frame);
+
+ const raw=Math.min(clock.getDelta(),.05);
+ accumulator+=raw;
+
+ let steps=0;
+
+ while(accumulator>=fixed&&steps<3){
+  if(mode==="player"){
+   updatePlayer(fixed);
+  }else{
+   updateCar(fixed);
+  }
+
+  updateEnvironment(fixed);
+  accumulator-=fixed;
+  steps++;
+ }
+
+ updateCamera(raw);
  renderer.render(scene,camera);
 }
-animate();
 
-window.addEventListener('resize',()=>{
+// START GAME
+camera.position.set(0,8,15);
+camera.lookAt(0,1,0);
+
+$("start").addEventListener("click",()=>{
+ $("menu").style.display="none";
+ say("WELCOME TO THE WILDERNESS");
+
+ updateObjective(
+  "Find your bearings",
+  "Explore the woodland. Collect wood and stone, then build a shelter."
+ );
+});
+
+window.addEventListener("resize",()=>{
  camera.aspect=innerWidth/innerHeight;
  camera.updateProjectionMatrix();
+
  renderer.setSize(innerWidth,innerHeight);
+ renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
 });
+
+updateResources();
+$("loading").style.display="none";
+frame();
 </script>
 </body>
 </html>
